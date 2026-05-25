@@ -1557,12 +1557,12 @@ startGrid();
   });
 
   // Wheel navigation (disabled in edit mode)
-  let wheelAcc=0,wheelTO=null;
+  let wheelAcc=0,wheelTO=null,wheelCooldown=false;
   document.addEventListener('wheel',e=>{
-    if(editMode)return;
+    if(editMode||wheelCooldown)return;
     wheelAcc+=e.deltaY+e.deltaX;
-    if(Math.abs(wheelAcc)>80){goToSlide(currentIdx+(wheelAcc>0?1:-1));wheelAcc=0;}
-    clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+    if(Math.abs(wheelAcc)>200){goToSlide(currentIdx+(wheelAcc>0?1:-1));wheelAcc=0;wheelCooldown=true;setTimeout(()=>{wheelCooldown=false;},350);}
+    clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,250);
   },{passive:true});
 
   // Init
