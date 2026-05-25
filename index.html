@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-deck-id="pbr-dye-workflow">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PBR 染色系统 · 教学手册</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Sans+SC:wght@200;300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ========== VIEWPORT BASE ========== */
+html,body{height:100%;overflow-x:hidden}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.slide{width:100vw;height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;display:flex;flex-direction:column;position:relative}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-height:100%;overflow:hidden}
+
+/* ========== THEME TOKENS ========== */
+:root{
+  --paper:#fafaf8;--paper-rgb:250,250,248;
+  --ink:#0a0a0a;--ink-rgb:10,10,10;
+  --grey-1:#f0f0ee;--grey-2:#d4d4d2;--grey-3:#737373;
+  --accent:#002FA7;--accent-rgb:0,47,167;--accent-on:#ffffff;--accent-bright:#5B7BFF;
+  --text-primary:#0a0a0a;--text-secondary:#525252;--text-helper:#737373;
+  --border-subtle:#e0e0e0;--border-strong:#a3a3a3;
+  --sans:"Inter","Helvetica Neue","Helvetica","Arial",system-ui,sans-serif;
+  --sans-zh:"PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans SC","Microsoft YaHei UI",sans-serif;
+  --mono:"JetBrains Mono","IBM Plex Mono","SF Mono","Consolas","Courier New",monospace;
+  --slide-bg-deep:var(--paper);--slide-bg-gradient:var(--paper);
+  --deck-chrome-bg:rgba(250,250,248,.94);--deck-chrome-border:rgba(0,0,0,.14);
+  --deck-chrome-text:#0a0a0a;--deck-chrome-muted:#737373;
+  --deck-chrome-accent:#002FA7;--deck-chrome-shadow:0 12px 40px rgba(0,0,0,.12);
+  --deck-chrome-surface:rgba(240,240,238,.92);
+  --title-size:clamp(1.5rem,5vw,4rem);--h2-size:clamp(1.25rem,3.5vw,2.5rem);
+  --body-size:clamp(.75rem,1.5vw,1.125rem);--small-size:clamp(.65rem,1vw,.875rem);
+  --slide-padding:clamp(1rem,4vw,4rem);--content-gap:clamp(.5rem,2vw,2rem);
+  --font-display:var(--sans);--font-body:var(--sans),var(--sans-zh);
+}
+
+/* ========== SLIDE VARIANTS ========== */
+.slide.grey{background:var(--grey-1)}
+.slide.dark{background:var(--ink);color:var(--paper)}
+.slide.accent{background:var(--accent);color:var(--accent-on)}
+.slide.hero{background:transparent}
+.slide.hero.grey{background:rgba(var(--paper-rgb),.86);backdrop-filter:blur(1px)}
+.slide.hero.dark{background:rgba(var(--ink-rgb),.92);color:var(--paper)}
+/* Smooth transitions on interactive elements */
+.slide{transition:opacity .15s ease}
+.card-fill,.mode-card,.channel-box,.flow-node-box{transition:transform .2s ease,box-shadow .2s ease}
+
+/* ========== IMAGE LOADING STATE ========== */
+.frame-img img{transition:opacity .4s ease}
+.frame-img:not(.loaded) img{opacity:0}
+.frame-img.loaded img{opacity:1}
+.frame-img .img-loading{display:flex;align-items:center;justify-content:center;position:absolute;inset:0;color:var(--text-helper);font-family:var(--mono);font-size:11px;letter-spacing:.12em}
+.frame-img.loaded .img-loading{display:none}
+
+/* ========== TYPOGRAPHY ========== */
+.t-cat{font-family:var(--mono);font-size:clamp(10px,1.1vw,14px);font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text-helper);line-height:1.3}
+.t-cat.accent{color:var(--accent)}
+.slide.dark .t-cat{color:rgba(255,255,255,.78)}
+.slide.accent .t-cat{color:rgba(255,255,255,.78)}
+.t-meta{font-family:var(--mono);font-size:clamp(10px,1.1vw,14px);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-helper)}
+.t-body{font-family:var(--sans),var(--sans-zh);font-size:clamp(14px,1.3vw,18px);line-height:1.5;color:var(--text-primary)}
+.t-body-sm{font-family:var(--sans),var(--sans-zh);font-size:clamp(12px,1.1vw,16px);line-height:1.55;color:var(--text-secondary)}
+.t-h-prod{font-family:var(--sans),var(--sans-zh);font-size:clamp(14px,1.3vw,22px);font-weight:600;line-height:1.4;color:var(--text-primary)}
+.slide.dark .t-body,.slide.dark .t-h-prod{color:var(--paper)}
+.slide.dark .t-body-sm{color:rgba(255,255,255,.78)}
+
+/* ========== COMPONENTS ========== */
+.rule{width:100%;height:1px;background:currentColor;opacity:.18}
+.rule.thick{height:2px;opacity:.85}
+.rule.accent{background:var(--accent);opacity:1;height:2px}
+.chrome-min{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:clamp(10px,1.1vw,14px);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-helper);flex:0 0 auto;margin-bottom:clamp(16px,3.5vh,40px)}
+.slide.dark .chrome-min{color:rgba(255,255,255,.62)}
+.slide.accent .chrome-min{color:rgba(255,255,255,.62)}
+.card-fill{background:#f5f5f4;padding:clamp(12px,2.4vh,24px) clamp(10px,1.6vw,24px);color:var(--text-primary)}
+.card-ink{background:var(--ink);padding:clamp(12px,2.4vh,24px) clamp(10px,1.6vw,24px);color:var(--paper)}
+.card-accent{background:var(--accent);padding:clamp(12px,2.4vh,24px) clamp(10px,1.6vw,24px);color:var(--accent-on)}
+.slide.dark .card-fill{background:rgba(255,255,255,.06);color:var(--paper)}
+.frame-img{overflow:hidden;position:relative;background:var(--paper);border-top:2px solid var(--accent)}
+.slide.dark .frame-img{background:rgba(255,255,255,.06)}
+.frame-img>img{width:100%;height:100%;object-fit:contain;display:block}
+.frame-img.r-16x9{aspect-ratio:16/9}.frame-img.r-4x3{aspect-ratio:4/3}.frame-img.r-1x1{aspect-ratio:1/1}
+.frame-img.h-22{height:22vh}.frame-img.h-28{height:28vh}.frame-img.h-32{height:32vh}.frame-img.h-40{height:40vh}
+.img-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2vh;color:var(--text-helper);font-family:var(--mono);font-size:clamp(10px,1vw,14px);letter-spacing:.12em;padding:2vh}
+.img-placeholder svg{width:clamp(20px,3vw,48px);height:clamp(20px,3vw,48px);opacity:.4}
+.img-cap{display:block;margin-top:.8vh;font-family:var(--mono);font-size:clamp(10px,.82vw,14px);letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+.split-half{display:grid;grid-template-columns:1fr 1fr;gap:0;flex:1;align-items:stretch}
+.split-half>.half{padding:clamp(20px,5vh,48px) clamp(16px,3.4vw,40px);display:flex;flex-direction:column;min-width:0}
+.split-half>.half.r-border{border-left:1px solid rgba(127,127,127,.22)}
+.split-half>.half.b-accent{background:var(--accent);color:var(--accent-on)}
+.split-half>.half.b-ink{background:var(--ink);color:var(--paper)}
+.mode-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.6vw,24px);margin-top:clamp(8px,2.4vh,24px)}
+.mode-card{display:flex;flex-direction:column;gap:clamp(6px,1.2vh,12px);padding:clamp(12px,2.4vh,24px) clamp(10px,1.6vw,24px);background:var(--grey-1);border-radius:3px;min-height:0}
+.mode-card.active{background:var(--accent);color:var(--accent-on)}
+.mode-card.active .t-body-sm{color:rgba(255,255,255,.86)}
+.mode-card.active .t-cat{color:rgba(255,255,255,.78)}
+.channel-boxes{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.4vw,20px);margin-top:clamp(8px,2vh,20px)}
+.channel-box{display:flex;flex-direction:column;gap:clamp(6px,1.2vh,12px);padding:clamp(10px,2vh,20px) clamp(10px,1.4vw,20px);background:var(--grey-1);border-radius:3px}
+.channel-swatch{width:100%;height:6vh;border-radius:2px}
+.flow-diagram{display:flex;align-items:center;gap:0;margin-top:clamp(12px,3vh,30px)}
+.flow-node{display:flex;flex-direction:column;align-items:center;gap:clamp(4px,.8vh,8px);padding:clamp(8px,2vh,20px) clamp(8px,1.2vw,16px);flex:1;text-align:center}
+.flow-node-box{width:100%;padding:clamp(8px,1.6vh,16px) clamp(6px,1vw,12px);border:2px solid var(--accent);border-radius:3px;background:var(--paper)}
+.flow-node-box.ink{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.flow-node-box.accent{background:var(--accent);color:var(--accent-on);border-color:var(--accent)}
+.flow-arrow{flex:0 0 auto;width:clamp(16px,4vw,40px);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:clamp(12px,1.4vw,20px)}
+.slide.dark .flow-arrow{color:var(--accent-bright)}
+.param-table{width:100%;border-collapse:collapse;margin-top:clamp(8px,1.6vh,16px)}
+.param-table th{font-family:var(--mono);font-size:clamp(10px,.78vw,13px);letter-spacing:.14em;text-transform:uppercase;color:var(--text-helper);font-weight:600;text-align:left;padding:clamp(6px,1vh,10px) clamp(6px,.8vw,10px);border-bottom:2px solid var(--accent)}
+.param-table td{font-family:var(--sans),var(--sans-zh);font-size:clamp(12px,.88vw,15px);padding:clamp(6px,1vh,10px) clamp(6px,.8vw,10px);border-bottom:1px solid var(--border-subtle);vertical-align:top;line-height:1.5}
+.param-table td code{font-family:var(--mono);font-size:.92em;font-weight:500;background:var(--grey-1);padding:.15em .5em;border-radius:2px}
+.slide.dark .param-table td code{background:rgba(255,255,255,.1);color:var(--paper)}
+
+/* ========== CANVAS CARD ========== */
+.canvas-card{width:100%;height:100%;background:var(--paper);color:var(--ink);padding:clamp(24px,5.6vh,56px) clamp(20px,5vw,48px) clamp(20px,4.4vh,44px);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.slide.dark .canvas-card{background:var(--ink);color:var(--paper)}
+.slide.accent .canvas-card{background:var(--accent);color:var(--accent-on)}
+canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;opacity:.55;mix-blend-mode:multiply;pointer-events:none}
+body.dark-bg canvas.bg{mix-blend-mode:screen;opacity:.42}
+body.low-power canvas.bg,body.low-power canvas.ascii-bg{display:none!important}
+canvas.ascii-bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;mix-blend-mode:screen;opacity:.92}
+.canvas-card>*:not(.ascii-bg){position:relative;z-index:1}
+
+/* ========== SPEAKER NOTES ========== */
+#speaker-notes{position:fixed;bottom:0;left:0;right:0;height:0;overflow:hidden;background:var(--ink);color:var(--paper);z-index:50;transition:height .4s cubic-bezier(.4,0,.2,1);padding:0}
+#speaker-notes.visible{height:28vh;padding:clamp(8px,2vh,20px) clamp(16px,4vw,40px) clamp(6px,1.6vh,16px);overflow-y:auto}
+#speaker-notes .notes-header{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-bright);margin-bottom:1vh;display:flex;justify-content:space-between;align-items:center}
+#speaker-notes .notes-body{font-family:var(--sans),var(--sans-zh);font-size:16px;line-height:1.7;color:rgba(255,255,255,.88)}
+#speaker-notes .notes-body strong{color:#fff}
+
+/* ========== LOW POWER ========== */
+.is-win{}
+
+/* ========== EDITABLE RUNTIME ========== */
+/* Hover-reveal left control cluster */
+#deckLeftHover{position:fixed;top:10px;left:10px;z-index:9500;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+#deckLeftHover .hover-row{display:flex;gap:4px;opacity:0;pointer-events:none;transition:opacity .25s ease}
+#deckLeftHover.show .hover-row{opacity:1;pointer-events:auto}
+#deckLeftHover.show{pointer-events:auto}
+/* When edit mode is active: show all controls always-visible (no hover needed) */
+body.deck-edit-mode #deckLeftHover{left:10px;top:10px;pointer-events:auto}
+body.deck-edit-mode #deckLeftHover .hover-row{opacity:1;pointer-events:auto}
+body.deck-edit-mode #deckLeftHover #hoverRowEdit{display:flex!important}
+#deckLeftHover .hover-row button{border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-bg);color:var(--deck-chrome-text);border-radius:6px;padding:5px 10px;font-size:13px;cursor:pointer;backdrop-filter:blur(8px);white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+#deckLeftHover .hover-row button:hover{filter:brightness(1.06)}
+#deckLeftHover .hover-row button.active{background:var(--deck-chrome-accent);color:#fff;border-color:var(--deck-chrome-accent)}
+#deckLeftHover .hover-row button:disabled{opacity:.35;cursor:default;filter:none}
+#deckLeftHover .hover-row .sep{width:1px;height:20px;background:var(--deck-chrome-border);margin:0 2px;flex-shrink:0;align-self:center}
+
+/* Always-visible edit mode indicator */
+#deckEditChrome{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9500;display:none;align-items:center;gap:4px;padding:5px 10px;background:var(--deck-chrome-bg);border:1px solid var(--deck-chrome-border);border-radius:8px;box-shadow:var(--deck-chrome-shadow);font-family:var(--sans),var(--sans-zh);backdrop-filter:blur(8px)}
+body.deck-edit-mode #deckEditChrome{display:flex}
+#deckEditChrome button{border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-surface);color:var(--deck-chrome-text);border-radius:6px;padding:4px 8px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+#deckEditChrome button:hover{filter:brightness(1.06)}
+#deckEditChrome button.active{background:var(--deck-chrome-accent);color:#fff;border-color:var(--deck-chrome-accent)}
+#deckEditChrome button:disabled{opacity:.35;cursor:default;filter:none}
+#deckEditChrome .sep{width:1px;height:18px;background:var(--deck-chrome-border);margin:0 3px;flex-shrink:0}
+#deckEditChrome .spacer{flex:1}
+#deckEditChrome .slide-counter{font-size:12px;color:var(--deck-chrome-muted);font-family:var(--mono)}
+
+/* Progress bar */
+#deckProgressBar{position:fixed;top:0;left:0;height:3px;background:var(--deck-chrome-accent);z-index:9600;transition:width .3s ease;pointer-events:none;display:none}
+body.deck-edit-mode #deckProgressBar{display:block}
+
+/* Nav dots */
+#deckNavDots{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:9500;display:none;flex-direction:column;gap:6px;align-items:center}
+body.deck-edit-mode #deckNavDots{display:flex}
+#deckNavDots .deck-nav-dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-surface);cursor:pointer;padding:0;transition:all .2s}
+#deckNavDots .deck-nav-dot.active{background:var(--deck-chrome-accent);border-color:var(--deck-chrome-accent);width:8px;height:20px;border-radius:4px}
+
+/* Sidebar */
+#deckSidebar{position:fixed;top:0;right:0;bottom:0;width:220px;z-index:9550;display:none;flex-direction:column;background:var(--deck-chrome-bg);border-left:1px solid var(--deck-chrome-border);box-shadow:var(--deck-chrome-shadow);overflow-y:auto}
+body.deck-edit-mode.sidebar-open #deckSidebar{display:flex}
+#deckSidebar .sidebar-header{padding:8px 10px;font-size:13px;font-weight:600;color:var(--deck-chrome-text);border-bottom:1px solid var(--deck-chrome-border);display:flex;justify-content:space-between;align-items:center}
+#deckSidebar .sidebar-header button{border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-surface);color:var(--deck-chrome-text);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer}
+#deckSidebar .sidebar-list{flex:1;overflow-y:auto;padding:8px}
+#deckSidebar .sidebar-footer{padding:8px;border-top:1px solid var(--deck-chrome-border);display:flex;gap:6px;flex-wrap:wrap}
+#deckSidebar .sidebar-footer button{flex:1;border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-surface);color:var(--deck-chrome-text);border-radius:6px;padding:6px 8px;font-size:12px;cursor:pointer;white-space:nowrap}
+#deckSidebar .sidebar-footer button:hover{filter:brightness(1.06)}
+#deckSidebar .sidebar-thumb{border:2px solid transparent;border-radius:6px;overflow:hidden;margin-bottom:8px;cursor:pointer;position:relative;transition:border-color .15s}
+#deckSidebar .sidebar-thumb:hover{border-color:var(--deck-chrome-muted)}
+#deckSidebar .sidebar-thumb.active{border-color:var(--deck-chrome-accent)}
+#deckSidebar .sidebar-thumb.dragging{opacity:.4}
+#deckSidebar .sidebar-thumb .thumb-label{font-size:11px;color:var(--deck-chrome-muted);padding:3px 6px;font-family:var(--mono);display:flex;justify-content:space-between;align-items:center}
+#deckSidebar .sidebar-thumb .thumb-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s}
+#deckSidebar .sidebar-thumb:hover .thumb-actions{opacity:1}
+#deckSidebar .sidebar-thumb .thumb-actions button{border:none;background:var(--deck-chrome-surface);color:var(--deck-chrome-muted);border-radius:4px;width:20px;height:20px;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+#deckSidebar .sidebar-thumb .thumb-actions button:hover{color:var(--deck-chrome-text);background:var(--deck-chrome-border)}
+
+/* Slide edit layer */
+.slide-edit-layer{position:absolute;inset:0;z-index:5;pointer-events:none}
+
+/* Slide objects (legacy wrapped) */
+.slide-object{position:absolute;pointer-events:auto;z-index:10}
+.slide-object.is-selected{outline:2px solid var(--deck-chrome-accent);outline-offset:1px}
+.slide-object.multi-selected{outline:2px dashed #a78bfa;outline-offset:1px}
+
+/* Direct element selection */
+body.deck-edit-mode .canvas-card *:not(.slide-edit-layer):not(.slide-edit-layer *):not([data-deck-chrome]):is(h1,h2,h3,h4,p,table,ul,ol,.frame-img,.card-fill,.mode-card,.channel-box,.card-accent,.card-ink,.flow-node,.flow-arrow){cursor:pointer;transition:outline .15s ease,background .15s ease}
+body.deck-edit-mode .canvas-card *:not(.slide-edit-layer):not(.slide-edit-layer *):not([data-deck-chrome]):is(h1,h2,h3,h4,p,table,ul,ol,.frame-img,.card-fill,.mode-card,.channel-box,.card-accent,.card-ink,.flow-node,.flow-arrow):hover{outline:1.5px dashed rgba(0,47,167,.4);outline-offset:2px;border-radius:2px}
+body.deck-edit-mode .canvas-card *:not(.slide-edit-layer):not(.slide-edit-layer *):not([data-deck-chrome]).is-selected{outline:2.5px solid var(--deck-chrome-accent)!important;outline-offset:2px;border-radius:2px;box-shadow:0 0 0 4px rgba(0,47,167,.1)}
+body.deck-edit-mode .canvas-card *:not(.slide-edit-layer):not(.slide-edit-layer *):not([data-deck-chrome]).multi-selected{outline:2px dashed #a78bfa!important;outline-offset:2px;border-radius:2px}
+
+/* Move handle */
+.slide-object-move{position:absolute;top:-14px;left:-4px;z-index:20;cursor:grab;font-size:14px;line-height:1;border:none;background:var(--deck-chrome-bg);color:var(--deck-chrome-muted);padding:1px 4px;border-radius:4px;opacity:0;transition:opacity .15s;pointer-events:auto}
+body.deck-edit-mode .slide-object:hover .slide-object-move,body.deck-edit-mode .slide-object.is-selected .slide-object-move{opacity:1}
+.slide-object-move:active{cursor:grabbing}
+
+/* Delete button */
+.slide-object-delete{position:absolute;top:-14px;right:-8px;z-index:20;cursor:pointer;font-size:14px;line-height:1;border:none;background:var(--deck-chrome-bg);color:var(--deck-chrome-muted);padding:1px 4px;border-radius:4px;opacity:0;transition:opacity .15s;pointer-events:auto}
+body.deck-edit-mode .slide-object:hover .slide-object-delete,body.deck-edit-mode .slide-object.is-selected .slide-object-delete{opacity:1}
+.slide-object-delete:hover{color:#e53e3e;background:var(--deck-chrome-bg)}
+
+/* Resize handle (single corner button) */
+.slide-object-resize{position:absolute;bottom:-6px;right:-6px;width:14px;height:14px;z-index:20;cursor:nwse-resize;background:var(--deck-chrome-accent);border:2px solid #fff;border-radius:2px;opacity:0;transition:opacity .15s;pointer-events:auto;display:none}
+body.deck-edit-mode .slide-object.is-selected .slide-object-resize{display:block;opacity:1}
+
+/* Object text */
+.slide-object-text{min-height:1.2em;outline:none;width:100%;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word}
+body.deck-edit-mode .slide-object[data-object-type="text"] .slide-object-text{cursor:text}
+body.deck-edit-mode .canvas-card :not(.slide-edit-layer):not(.slide-edit-layer *):not([data-deck-chrome]):is(.t-body,.t-body-sm,.t-h-prod,.t-cat,.t-meta):hover{cursor:text;outline:1.5px dashed rgba(0,47,167,.35);outline-offset:2px;border-radius:2px}
+
+/* Object graphic */
+.slide-object-graphic{width:100%;height:100%;box-sizing:border-box;position:relative}
+.slide-object-graphic img,.slide-object-graphic video{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.slide-object-graphic--empty{display:flex;align-items:center;justify-content:center;min-height:clamp(40px,10vh,80px);border-radius:8px;border:1px dashed color-mix(in srgb, var(--deck-chrome-muted) 55%, transparent);background:linear-gradient(135deg,rgba(100,116,139,.2),rgba(148,163,184,.12))}
+
+/* Snap guide lines */
+.snap-guide{position:absolute;background:var(--accent-bright);pointer-events:none;z-index:7;opacity:.85}
+.snap-guide.snap-v{width:1px;top:0;bottom:0}
+.snap-guide.snap-h{height:1px;left:0;right:0}
+
+/* Cursor crosshair tracker */
+.cursor-crosshair-h,.cursor-crosshair-v{position:fixed;pointer-events:none;z-index:9400;display:none;opacity:.35}
+body.deck-edit-mode .cursor-crosshair-h,body.deck-edit-mode .cursor-crosshair-v{display:block}
+.cursor-crosshair-h{left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,var(--accent-bright) 0,var(--accent-bright) 6px,transparent 6px,transparent 12px)}
+.cursor-crosshair-v{top:0;bottom:0;width:1px;background:repeating-linear-gradient(180deg,var(--accent-bright) 0,var(--accent-bright) 6px,transparent 6px,transparent 12px)}
+
+/* Cursor position badge */
+.cursor-pos-badge{position:fixed;bottom:14px;right:14px;z-index:9450;display:none;padding:3px 8px;background:var(--deck-chrome-bg);border:1px solid var(--deck-chrome-border);border-radius:6px;font-family:var(--mono);font-size:11px;color:var(--deck-chrome-muted);backdrop-filter:blur(8px);pointer-events:none;white-space:nowrap}
+body.deck-edit-mode .cursor-pos-badge{display:block}
+
+/* RTE toolbar */
+.rte-toolbar{position:fixed;z-index:9600;display:none;flex-direction:column;gap:0;min-width:min(240px,92vw);padding:6px;background:var(--deck-chrome-bg);border:1px solid var(--deck-chrome-border);border-radius:10px;box-shadow:var(--deck-chrome-shadow);backdrop-filter:blur(8px)}
+.rte-toolbar.visible{display:flex}
+.rte-toolbar-main{display:flex;flex-wrap:wrap;align-items:center;gap:3px}
+.rte-toolbar button{border:1px solid transparent;background:transparent;color:var(--deck-chrome-text);border-radius:5px;padding:4px 7px;font-size:12px;cursor:pointer;line-height:1.2}
+.rte-toolbar button:hover{background:var(--deck-chrome-surface)}
+.rte-toolbar button.is-active{background:var(--deck-chrome-accent);color:#fff;border-color:var(--deck-chrome-accent)}
+.rte-toolbar button.drawer-trigger.is-active{outline:1px solid var(--deck-chrome-accent);outline-offset:-1px}
+.rte-toolbar .rte-sep{width:1px;height:18px;background:var(--deck-chrome-border);margin:0 2px}
+.rte-drawer{display:none;margin-top:4px;padding-top:4px;border-top:1px solid var(--deck-chrome-border);flex-direction:column;gap:4px}
+.rte-drawer.open{display:flex}
+.rte-drawer-row{display:flex;flex-wrap:wrap;gap:3px}
+.rte-drawer .rte-custom-input{display:flex;gap:4px;align-items:center;margin-top:2px}
+.rte-drawer .rte-custom-input input{width:60px;border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-surface);color:var(--deck-chrome-text);border-radius:4px;padding:3px 6px;font-size:12px}
+.rte-drawer .rte-custom-input button{border:1px solid var(--deck-chrome-border);background:var(--deck-chrome-surface);color:var(--deck-chrome-text);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer}
+
+/* Add element menu */
+#deckAddElementMenu{position:fixed;z-index:9650;display:none;padding:6px;background:var(--deck-chrome-bg);border:1px solid var(--deck-chrome-border);border-radius:10px;box-shadow:var(--deck-chrome-shadow);min-width:180px;backdrop-filter:blur(8px)}
+#deckAddElementMenu.visible{display:block}
+#deckAddElementMenu button{display:block;width:100%;text-align:left;border:none;background:none;color:var(--deck-chrome-text);padding:8px 10px;font-size:13px;cursor:pointer;border-radius:6px}
+#deckAddElementMenu button:hover{background:var(--deck-chrome-surface)}
+
+/* Responsive */
+@media (max-width:900px){
+  .flow-steps,.flow-diagram{flex-direction:column}
+  .mode-cards{grid-template-columns:1fr}
+  .channel-boxes{grid-template-columns:1fr 1fr}
+  .split-half{grid-template-columns:1fr}
+  #deckSidebar{width:180px}
+}
+</style>
+</head>
+<body>
+<script>
+(function(){
+  const KEY='guizang-ppt-low-power';
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stored=localStorage.getItem(KEY);
+  window.__lowPowerMode=stored==='1'||(stored===null&&reduced);
+  window.__setLowPowerMode=function(on,opts={}){
+    window.__lowPowerMode=!!on;
+    document.body.classList.toggle('low-power',window.__lowPowerMode);
+    if(opts.persist!==false)localStorage.setItem(KEY,window.__lowPowerMode?'1':'0');
+    if(window.__lowPowerMode&&document.getAnimations)document.getAnimations().forEach(a=>a.cancel());
+  };
+  document.body.classList.toggle('low-power',window.__lowPowerMode);
+})();
+</script>
+
+<canvas id="bg-grid" class="bg"></canvas>
+
+<!-- Cursor crosshair lines -->
+<div class="cursor-crosshair-h" id="cursorH"></div>
+<div class="cursor-crosshair-v" id="cursorV"></div>
+<div class="cursor-pos-badge" id="cursorPos">0, 0</div>
+
+<!-- Editable Deck Chrome: hover-reveal left cluster -->
+<div id="deckLeftHover">
+  <!-- Row 1: always-available -->
+  <div class="hover-row" id="hoverRowMain">
+    <button id="btnEditMode" title="Edit mode (E)">✎ Edit</button>
+    <button id="btnSidebar" title="Pages sidebar">☰ Pages</button>
+  </div>
+  <!-- Row 2: edit-mode only -->
+  <div class="hover-row" id="hoverRowEdit">
+    <button id="btnSave" title="Save (Ctrl+S)">💾 Save</button>
+    <div class="sep"></div>
+    <button id="btnUndo" title="Undo (Ctrl+Z)">↶</button>
+    <button id="btnRedo" title="Redo (Ctrl+Y)">↷</button>
+    <div class="sep"></div>
+    <button id="btnAddElement" title="Add element">+ Add</button>
+    <div class="sep"></div>
+    <button id="btnDone" title="Exit edit mode (Esc)">Done</button>
+  </div>
+</div>
+
+<!-- Secondary edit chrome (slide counter + export) -->
+<div id="deckEditChrome">
+  <span class="slide-counter" id="deckSlideCounter">1 / 14</span>
+  <div class="spacer"></div>
+  <button id="btnExport" title="Export HTML">↓ Export</button>
+</div>
+
+<div id="deckProgressBar"></div>
+<div id="deckNavDots"></div>
+<div id="deckSidebar">
+  <div class="sidebar-header"><span>Pages</span><button id="btnCloseSidebar">✕</button></div>
+  <div class="sidebar-list" id="sidebarList"></div>
+  <div class="sidebar-footer">
+    <button id="btnNewPage">+ New Page</button>
+    <button id="btnExportSidebar">Export HTML</button>
+  </div>
+</div>
+
+<!-- RTE Toolbar -->
+<div class="rte-toolbar" id="rteToolbar" data-deck-chrome-surface>
+  <div class="rte-toolbar-main">
+    <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <div class="rte-sep"></div>
+    <button class="drawer-trigger" data-drawer="font" title="Font family">Aa</button>
+    <button class="drawer-trigger" data-drawer="scale" title="Size scale">⊞ Scale</button>
+    <button class="drawer-trigger" data-drawer="px" title="Fixed px size">Px</button>
+  </div>
+  <div class="rte-drawer" id="drawerFont">
+    <div class="rte-drawer-row">
+      <button data-font="var(--sans),var(--sans-zh)" title="Body">Body</button>
+      <button data-font="var(--mono)" title="Mono">Mono</button>
+      <button data-font="'Noto Sans SC',sans-serif" title="Noto SC">Noto SC</button>
+      <button data-font="'Georgia','Times New Roman',serif" title="Serif">Serif</button>
+    </div>
+  </div>
+  <div class="rte-drawer" id="drawerScale">
+    <div class="rte-drawer-row">
+      <button data-size-factor="0.8" title="Small">S</button>
+      <button data-size-factor="1" title="Medium">M</button>
+      <button data-size-factor="1.25" title="Large">L</button>
+      <button data-size-factor="1.5" title="Extra Large">XL</button>
+    </div>
+  </div>
+  <div class="rte-drawer" id="drawerPx">
+    <div class="rte-drawer-row">
+      <button data-size-px="16">16</button>
+      <button data-size-px="24">24</button>
+      <button data-size-px="36">36</button>
+      <button data-size-px="48">48</button>
+      <button data-size-px="72">72</button>
+    </div>
+    <div class="rte-custom-input">
+      <input type="number" id="rteCustomPx" min="8" max="400" placeholder="Custom…">
+      <button id="rteCustomApply">Apply</button>
+      <button id="rteCustomCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add element menu -->
+<div id="deckAddElementMenu"><button data-add-type="text">Text</button><button data-add-type="image">Image</button><button data-add-type="video">Video</button></div>
+
+<!-- Speaker Notes -->
+<div id="speaker-notes">
+  <div class="notes-header"><span>🎤 讲解备注 · SPEAKER NOTES</span><span style="opacity:.5">按 S 关闭</span></div>
+  <div class="notes-body" id="notes-content"></div>
+</div>
+
+<!-- ==================== SLIDES ==================== -->
+<div id="deck" class="slides-offset">
+
+<!-- S01 封面 -->
+<section class="slide hero accent" id="slide-1" data-animate="hero">
+<div class="canvas-card"><canvas class="ascii-bg" aria-hidden="true"></canvas>
+  <div class="chrome-min" data-deck-chrome="1" style="color:rgba(255,255,255,.62)"><div class="l">PBR 染色系统 · 教学手册</div><div class="r">2026.05 · 01 / 14</div></div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(12px,2.6vh,26px)">
+    <div class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em" data-deck-chrome="1">PBR DYEING SYSTEM · TUTORIAL</div>
+    <h1 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(2.5rem,10vw,10rem);line-height:.96;letter-spacing:-.025em;color:#fff" data-object="title">PBR 染色<br/><span style="font-style:italic;font-weight:300">系统教学</span></h1>
+    <div class="t-body-sm" style="max-width:52ch;color:rgba(255,255,255,.86);font-size:clamp(14px,1.1vw,17px)" data-deck-chrome="1">基于 pbr_dye shader 的完整染色管线教学——从美术分区设置到程序参数配置。</div>
+    <div style="display:flex;justify-content:space-between;align-items:end;border-top:1px solid rgba(255,255,255,.22);padding-top:clamp(8px,2vh,20px)">
+      <p class="t-meta" style="color:rgba(255,255,255,.6);margin:0" data-object="text">陈斯远 · TA 团队 · WUZU</p>
+      <p class="t-meta" style="color:rgba(255,255,255,.6);margin:0" data-object="text">→ 翻页 · S 讲解备注</p>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes>欢迎学习 PBR 染色系统。本教程基于 pbr_dye shader，从美术设置到程序参数，完整讲解角色染色管线的每个环节。建议配合实际引擎操作，边学边练。</div>
+
+<!-- S02 目录 -->
+<section class="slide" id="slide-2" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CONTENTS · 课程目录</div><div class="r">02 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">WHAT YOU'LL LEARN</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.8rem,5.2vw,5.2rem);line-height:1.05;letter-spacing:-.025em">课程<span style="font-weight:300;font-style:italic">大纲</span></h2></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,2.4vh,24px) clamp(12px,2.4vw,24px);align-content:start">
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">01</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">Shader 概述</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">pbr_dye 是什么，如何开启染色</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">02</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">染色分区</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">4 个分区如何通过遮罩图控制</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">03</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">颜色控制</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">3 种染色模式详解</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">04</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">渐变方式</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">方向渐变 vs 贴图渐变</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">05</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">程序参数</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">整体参数 + 区域参数完整说明</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">06</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">贴花制作</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">自定义图案叠加方法</p></div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes>本课程分为 6 个章节。从 Shader 基础概念开始，逐步深入到分区、颜色控制、渐变方式，最后讲解程序参数和贴花制作。</div>
+
+<!-- S03 Shader 概述 -->
+<section class="slide" id="slide-3" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 01 · Shader 概述</div><div class="r">03 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">PBR_DYE SHADER</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,5vw,5rem);line-height:1.05;letter-spacing:-.025em">pbr_dye <span style="font-weight:300;font-style:italic">染色着色器</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:start">
+      <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
+        <div class="card-fill"><div class="t-cat">Shader 名称</div><h3 style="font-family:var(--mono);font-size:clamp(18px,2.8vw,40px);font-weight:600;color:var(--accent);margin-top:clamp(4px,.6vh,6px)">pbr_dye</h3><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">基于 PBR 的染色着色器，在渲染控制中<strong>开启染色</strong>后生效</p></div>
+        <div class="card-fill"><div class="t-cat">核心能力</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:clamp(4px,.8vh,8px);margin-top:clamp(6px,1vh,10px)">
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> 支持最多 <strong>4 个染色分区</strong></li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> <strong>3 种染色模式</strong>：单色 / 双色渐变 / 多彩渐变</li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> <strong>2 种渐变方式</strong>：方向 / 贴图</li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> 独立调节色相/饱和度/亮度/金属度/粗糙度</li>
+          </ul>
+        </div>
+      </div>
+      <div><div class="frame-img r-4x3" style="background:var(--grey-1)"><img src="img/img01.png" alt="Fig.01 渲染控制中开启染色" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.01 渲染控制中开启染色</span></div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>pbr_dye</strong> 是基于 PBR（基于物理的渲染）的染色着色器。使用前需要在渲染控制中开启染色功能。<br/><br/>核心能力：4 分区、3 种染色模式、2 种渐变方式，以及独立的颜色和材质参数调节。</div>
+
+<!-- S04 染色分区 -->
+<section class="slide" id="slide-4" data-animate="grid-reveal">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 02 · 染色分区</div><div class="r">04 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">DYE PARTITIONING · 遮罩分区</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">通过遮罩图控制 <span style="font-weight:300;font-style:italic">4 个分区</span></h2></div>
+    <p class="t-body" style="opacity:.78">同一个材质支持 4 个分区，分别是遮罩图中的<strong>黑色</strong>、<strong>红色</strong>、<strong>绿色</strong>和<strong>蓝色</strong>区域。<br/><span style="color:var(--accent)">注意：Alpha 通道另有用处（贴图渐变时使用），不参与分区。</span></p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.4vw,14px)">
+      <div class="card-fill" style="text-align:center;padding:clamp(12px,2.4vh,24px) clamp(8px,1.4vw,14px)"><div style="width:100%;height:clamp(30px,8vh,60px);background:#000;border-radius:2px;margin-bottom:clamp(6px,1.4vh,14px)"></div><div class="t-cat">分区 0</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.6vh,6px)">黑色区域</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">RGB = (0,0,0)</p></div>
+      <div class="card-fill" style="text-align:center;padding:clamp(12px,2.4vh,24px) clamp(8px,1.4vw,14px)"><div style="width:100%;height:clamp(30px,8vh,60px);background:#ff0000;border-radius:2px;margin-bottom:clamp(6px,1.4vh,14px)"></div><div class="t-cat">分区 1</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.6vh,6px)">红色区域</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">RGB = (255,0,0)</p></div>
+      <div class="card-fill" style="text-align:center;padding:clamp(12px,2.4vh,24px) clamp(8px,1.4vw,14px)"><div style="width:100%;height:clamp(30px,8vh,60px);background:#00ff00;border-radius:2px;margin-bottom:clamp(6px,1.4vh,14px)"></div><div class="t-cat">分区 2</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.6vh,6px)">绿色区域</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">RGB = (0,255,0)</p></div>
+      <div class="card-fill" style="text-align:center;padding:clamp(12px,2.4vh,24px) clamp(8px,1.4vw,14px)"><div style="width:100%;height:clamp(30px,8vh,60px);background:#0000ff;border-radius:2px;margin-bottom:clamp(6px,1.4vh,14px)"></div><div class="t-cat">分区 3</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.6vh,6px)">蓝色区域</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">RGB = (0,0,255)</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:clamp(8px,2vw,20px);align-items:center;padding-top:clamp(8px,2vh,20px);border-top:1px solid var(--border-subtle)">
+      <div class="card-accent" style="padding:clamp(8px,1.6vh,16px) clamp(8px,1.4vw,14px);display:flex;align-items:center;gap:clamp(4px,1vw,10px)"><span style="font-family:var(--mono);font-size:14px;font-weight:600">UV SCALE</span></div>
+      <div><p class="t-body-sm">如果使用 1U 去分区，缩放偏移要设置为 <code style="font-family:var(--mono);font-weight:500;background:var(--grey-1);padding:.15em .5em;border-radius:2px">1, 1, 0, 0</code>（即 x=1, y=1, u=0, v=0）</p></div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>染色分区</strong>是染色系统的基础概念。<br/><br/>遮罩图使用 RGB 通道来区分染色区域：<br/>• 黑色 (0,0,0) → 分区 0  • 红色 (255,0,0) → 分区 1<br/>• 绿色 (0,255,0) → 分区 2  • 蓝色 (0,0,255) → 分区 3<br/><br/>⚠️ Alpha 通道不参与分区，它用于贴图渐变功能。<br/>⚠️ 如果使用 1U 去分区，缩放偏移必须设置成 1, 1, 0, 0。</div>
+
+<!-- S05 分区示意 -->
+<section class="slide grey" id="slide-5" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">分区示意 · MASK PREVIEW</div><div class="r">05 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">VISUAL REFERENCE</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">遮罩图<span style="font-weight:300;font-style:italic">效果示意</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center;flex:1">
+      <div><div class="frame-img r-1x1" style="background:var(--grey-1)"><img src="img/img02.png" alt="Fig.02 遮罩图分区示意（4 色分区）" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.02 遮罩图分区示意（4 色分区）</span></div>
+      <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
+        <div class="card-fill"><div class="t-cat">如何制作遮罩图</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">在 Photoshop 或 SP 中创建纯色图层，用不同颜色填充不同区域。每个颜色对应一个染色分区。</p></div>
+        <div class="card-fill"><div class="t-cat">注意事项</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:clamp(4px,.6vh,6px);margin-top:clamp(6px,1vh,10px)">
+            <li class="t-body-sm" style="padding-left:1em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">▸</span> 颜色值必须精确，不要有渐变混合</li>
+            <li class="t-body-sm" style="padding-left:1em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">▸</span> Alpha 通道保持白色（或按贴图渐变需求使用）</li>
+            <li class="t-body-sm" style="padding-left:1em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">▸</span> 贴图格式为 RGBA，不要用压缩格式</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="t-meta" style="color:var(--text-helper)">参考 POPO 文档 · 美术设置 → 染色分区</div>
+  </div>
+</div>
+</section>
+<div data-notes>这张图展示了遮罩图的实际效果。RGB 通道分别用黑/红/绿/蓝四种纯色来区分不同的染色区域。<br/><br/>制作时注意：颜色值必须精确为纯色，不能有渐变或混合。Alpha 通道保持白色。</div>
+
+<!-- S06 颜色控制 3 种模式 -->
+<section class="slide" id="slide-6" data-animate="grid-reveal">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 03 · 颜色控制</div><div class="r">06 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">DYE COLOR MODES · 3 种染色状态</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">分区颜色 <span style="font-weight:300;font-style:italic">3 种模式</span></h2><p class="t-body" style="margin-top:clamp(8px,1.6vh,16px);opacity:.78">通过参数控制：<code style="font-family:var(--mono);font-weight:500">0</code> 单色 · <code style="font-family:var(--mono);font-weight:500">1</code> 双色渐变 · <code style="font-family:var(--mono);font-weight:500">2</code> 多彩渐变</p></div>
+    <div class="mode-cards">
+      <div class="mode-card"><div style="width:100%;height:clamp(30px,8vh,60px);background:linear-gradient(180deg,#888,#444);border-radius:2px;display:flex;align-items:center;justify-content:center"><span style="font-family:var(--mono);font-size:clamp(16px,2vw,32px);font-weight:600;color:#fff">0</span></div><div class="t-cat">MODE 0 · 单色染色</div><h4 class="t-h-prod">去色 → 单色</h4><p class="t-body-sm">把基色<strong>去色</strong>后，使用染色 1 (u_dye_color_major) 颜色进行染色</p></div>
+      <div class="mode-card"><div style="width:100%;height:clamp(30px,8vh,60px);background:linear-gradient(180deg,#002FA7,#FF6B35);border-radius:2px;display:flex;align-items:center;justify-content:center"><span style="font-family:var(--mono);font-size:clamp(16px,2vw,32px);font-weight:600;color:#fff">1</span></div><div class="t-cat">MODE 1 · 双色渐变</div><h4 class="t-h-prod">去色 → 双色插值</h4><p class="t-body-sm">把基色<strong>去色</strong>后，在染色 1 和染色 2 之间<strong>直接插值</strong>渐变</p></div>
+      <div class="mode-card active"><div style="width:100%;height:clamp(30px,8vh,60px);background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);border-radius:2px;display:flex;align-items:center;justify-content:center"><span style="font-family:var(--mono);font-size:clamp(16px,2vw,32px);font-weight:600;color:#fff">2</span></div><div class="t-cat">MODE 2 · 多彩渐变</div><h4 class="t-h-prod">去色 → 色环插值</h4><p class="t-body-sm">把基色<strong>去色</strong>后，在两色之间<strong>沿色环最近距离</strong>插值渐变</p></div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>三种染色模式</strong>，通过 u_a_shift_mode 参数控制：<br/><br/><strong>Mode 0 · 单色</strong>：基色去色后，直接用 u_dye_color_major 覆盖。<br/><strong>Mode 1 · 双色渐变</strong>：基色去色后，在两色之间线性插值。<br/><strong>Mode 2 · 多彩渐变</strong>（重点推荐）：插值沿<strong>色环最短距离</strong>进行，从红到绿会经过黄色而非灰色。<br/><br/>⚠️ 所有模式第一步都是"去色"——基色转灰度再上色。</div>
+
+<!-- S07 模式对比 -->
+<section class="slide grey" id="slide-7" data-animate="duo-mirror">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">模式对比 · MODE COMPARISON</div><div class="r">07 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">VISUAL COMPARISON</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.5rem,4.6vw,4.6rem);line-height:1.05;letter-spacing:-.025em">三种模式<span style="font-weight:300;font-style:italic">效果对比</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center;flex:1">
+      <div><div class="frame-img r-4x3" style="background:var(--grey-1)"><img src="img/img03.png" alt="Fig.03 三种染色模式效果对比" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.03 三种染色模式效果对比</span></div>
+      <div style="display:flex;flex-direction:column;gap:clamp(8px,2vh,20px)">
+        <div class="card-fill"><div class="t-cat">HSL 独立调节</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">每个分区可单独调整：</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(4px,.8vh,8px) clamp(6px,1.2vw,12px);margin-top:clamp(6px,1vh,10px)">
+            <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_dye_hue</code><br/>色相偏移 (-1~1)</div>
+            <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_dye_saturate</code><br/>饱和度 (默认1, 最小0)</div>
+            <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_dye_value</code><br/>亮度 (默认1, 最小0)</div>
+            <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_roughness_shift</code><br/>粗糙度 (-1~1)</div>
+          </div>
+        </div>
+        <div class="card-fill"><div class="t-cat">金属度</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_metallic_shift</code><br/>金属度控制，默认 0，建议 -1~1</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes>除了基础颜色控制，每个分区还支持独立的 HSL 调节和材质控制。<br/><br/>建议值：色相 -1~1，饱和度/亮度最小 0，粗糙度/金属度建议 -1~1。</div>
+
+<!-- S08 渐变方式 -->
+<section class="slide" id="slide-8" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 04 · 渐变方式</div><div class="r">08 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">GRADIENT METHODS · 两种渐变</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">渐变<span style="font-weight:300;font-style:italic">方式</span></h2><p class="t-body" style="margin-top:clamp(8px,1.6vh,16px);opacity:.78">通过参数 <code style="font-family:var(--mono);font-weight:500">u_a_use_gradient_tex</code> 控制：<code style="font-family:var(--mono);font-weight:500">0</code> 方向渐变 · <code style="font-family:var(--mono);font-weight:500">1</code> 贴图渐变</p></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:start">
+      <div class="card-fill">
+        <div style="display:flex;align-items:center;gap:clamp(4px,1vw,10px);margin-bottom:clamp(8px,1.6vh,16px)"><span style="font-family:var(--mono);font-size:clamp(18px,3vw,40px);font-weight:600;color:var(--accent)">0</span><h3 class="t-h-prod">方向渐变</h3></div>
+        <p class="t-body-sm">根据物体<strong>自身空间位置</strong>进行渐变，可设置<strong>方向</strong>和<strong>范围</strong>。</p>
+        <div style="margin-top:clamp(8px,1.6vh,16px)"><div class="frame-img" style="background:var(--grey-1)"><img src="img/img04.png" alt="Fig.04 方向渐变 · SP灰度矫正" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.04 方向渐变 · SP灰度矫正</span></div>
+        <div style="margin-top:clamp(6px,1.4vh,14px);display:flex;flex-direction:column;gap:clamp(4px,.6vh,6px)">
+          <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_shift_direction</code> — 渐变方向</div>
+          <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_shift_range</code> — 渐变宽度</div>
+        </div>
+      </div>
+      <div class="card-fill">
+        <div style="display:flex;align-items:center;gap:clamp(4px,1vw,10px);margin-bottom:clamp(8px,1.6vh,16px)"><span style="font-family:var(--mono);font-size:clamp(18px,3vw,40px);font-weight:600;color:var(--accent)">1</span><h3 class="t-h-prod">贴图渐变</h3></div>
+        <p class="t-body-sm">根据遮罩图的 <strong>Alpha 通道</strong>值在两色间渐变。<strong>完全由美术控制</strong>。</p>
+        <div style="margin-top:clamp(8px,1.6vh,16px)"><div class="frame-img" style="background:var(--grey-1)"><img src="img/img05.png" alt="Fig.05 贴图渐变 · RGB通道mask" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.05 贴图渐变 · RGB通道mask</span></div>
+        <div style="margin-top:clamp(6px,1.4vh,14px);padding:clamp(6px,1.2vh,12px);background:var(--paper);border-radius:2px">
+          <div class="t-body-sm" style="color:var(--accent);font-weight:500">▸ Alpha 值 0 → 染色 1 颜色</div>
+          <div class="t-body-sm" style="color:var(--accent);font-weight:500">▸ Alpha 值 1 → 染色 2 颜色</div>
+          <div class="t-body-sm" style="color:var(--accent);font-weight:500">▸ Alpha 值 0.5 → 中间混合</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>两种渐变方式</strong>：<br/><br/><strong>Mode 0 · 方向渐变</strong>：根据物体空间坐标渐变，需设置 u_shift_direction 和 u_shift_range。<br/><strong>Mode 1 · 贴图渐变</strong>：使用遮罩图 Alpha 通道驱动。Alpha=0→染色1，Alpha=1→染色2。<br/><br/>⚠️ 贴图渐变时，Alpha 通道需根据需求绘制灰度值。</div>
+
+<!-- S09 模型结构 -->
+<section class="slide" id="slide-9" data-animate="grid-reveal">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 05 · 程序参数</div><div class="r">09 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">MODEL STRUCTURE · 模型结构</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">模型 <span style="font-weight:300;font-style:italic">结构</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center">
+      <div><div class="frame-img r-4x3" style="background:var(--grey-1)"><img src="img/img06.png" alt="Fig.06 模型分为 3 个部分" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.06 模型分为 3 个部分，每部分最多 4 个染色区域</span></div>
+      <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
+        <div class="card-fill"><div class="t-cat">结构说明</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">每个模型由美术分为<strong>若干个部分</strong>（如上衣/裤子/鞋子），每个部分又可拥有<strong>至多 4 个染色区域</strong>。</p></div>
+        <div class="card-accent"><div class="t-cat" style="color:rgba(255,255,255,.78)">计算方式</div><div style="font-family:var(--mono);font-size:clamp(16px,2.4vw,32px);font-weight:600;color:#fff;margin-top:clamp(6px,1vh,10px)">3 parts × 4 zones = 12 zones</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px);color:rgba(255,255,255,.86)">一个角色最多支持 12 个独立染色区域</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>模型结构</strong>：每个模型由美术分为若干部分，每部分最多 4 个染色区域。<br/><br/>例：3 个部分 × 4 区域 = 12 个独立可控染色区域。可以对角色每个部位的不同区域分别设置颜色、渐变和 HSL。</div>
+
+<!-- S10 整体参数 -->
+<section class="slide" id="slide-10" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">整体参数 · GLOBAL PARAMETERS</div><div class="r">10 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">PROGRAM PARAMETERS</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.5rem,4.6vw,4.6rem);line-height:1.05;letter-spacing:-.025em">整体<span style="font-weight:300;font-style:italic">参数</span></h2></div>
+    <table class="param-table">
+      <thead><tr><th style="width:32%">参数名</th><th style="width:18%">类型</th><th style="width:50%">说明</th></tr></thead>
+      <tbody>
+        <tr><td><code>UES_DYEING</code></td><td><code>macro</code></td><td>材质宏，需<strong>开启</strong>才能启用染色</td></tr>
+        <tr><td><code>DyeingMaskTex</code></td><td><code>Texture</code></td><td>遮罩贴图，RGB 对应 4 个分区</td></tr>
+        <tr><td><code>u_mask_scale_offset</code></td><td><code>half4</code></td><td>遮罩贴图缩放偏移。UV 时设为 <code>1,1,0,0</code></td></tr>
+        <tr><td><code>u_shift_direction</code></td><td><code>half3</code></td><td>方向染色方向向量</td></tr>
+        <tr><td><code>u_shift_range</code></td><td><code>half</code></td><td>方向染色渐变宽度</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+<div data-notes><strong>整体参数</strong>是所有染色区域共用的全局设置：<br/><br/>• <strong>UES_DYEING</strong>：材质宏，必须开启。最容易遗漏的一步。<br/>• <strong>DyeingMaskTex</strong>：遮罩贴图（黑/红/绿/蓝分区）。<br/>• <strong>u_mask_scale_offset</strong>：UV 缩放偏移，设为 1,1,0,0。<br/>• <strong>u_shift_direction / u_shift_range</strong>：方向渐变专用。</div>
+
+<!-- S11 区域参数 -->
+<section class="slide" id="slide-11" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">区域参数 · ZONE PARAMETERS</div><div class="r">11 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">PER-ZONE PARAMETERS</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.5rem,4.6vw,4.6rem);line-height:1.05;letter-spacing:-.025em">每个染色区域的 <span style="font-weight:300;font-style:italic">参数</span></h2><p class="t-body" style="margin-top:clamp(6px,1.2vh,12px);opacity:.78">后缀 <code style="font-family:var(--mono);font-weight:500">_0</code> <code style="font-family:var(--mono);font-weight:500">_1</code> <code style="font-family:var(--mono);font-weight:500">_2</code> <code style="font-family:var(--mono);font-weight:500">_3</code> 区分不同区域</p></div>
+    <table class="param-table">
+      <thead><tr><th style="width:30%">参数名</th><th style="width:14%">类型</th><th style="width:56%">说明</th></tr></thead>
+      <tbody>
+        <tr><td><code>u_a_shift_mode</code></td><td><code>half</code></td><td><code>0</code> 单色 · <code>1</code> 双色渐变 · <code>2</code> 多彩渐变</td></tr>
+        <tr><td><code>u_a_use_gradient_tex</code></td><td><code>half</code></td><td><code>0</code> 方向渐变 · <code>1</code> 贴图渐变</td></tr>
+        <tr><td><code>u_dye_color_major</code></td><td><code>half4</code></td><td>主要染色颜色，每种模式都使用</td></tr>
+        <tr><td><code>u_dye_color_minor</code></td><td><code>half4</code></td><td>次要染色颜色，模式 1、2 使用</td></tr>
+        <tr><td><code>u_dye_hue</code></td><td><code>half</code></td><td>色相偏移，默认 <code>0</code>，建议 <code>-1~1</code></td></tr>
+        <tr><td><code>u_dye_saturate</code></td><td><code>half</code></td><td>饱和度，默认 <code>1</code>，最小 <code>0</code></td></tr>
+        <tr><td><code>u_dye_value</code></td><td><code>half</code></td><td>亮度，默认 <code>1</code>，最小 <code>0</code></td></tr>
+        <tr><td><code>u_roughness_shift</code></td><td><code>half</code></td><td>粗糙度，默认 <code>0</code>，建议 <code>-1~1</code></td></tr>
+        <tr><td><code>u_metallic_shift</code></td><td><code>half</code></td><td>金属度，默认 <code>0</code>，建议 <code>-1~1</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+<div data-notes><strong>区域参数</strong>每个染色区域独立控制。重点：<br/>• u_a_shift_mode：3 种染色模式<br/>• u_a_use_gradient_tex：2 种渐变方式<br/>• u_dye_color_major/minor：主/次染色颜色<br/>• HSL + 粗糙度 + 金属度</div>
+
+<!-- S12 贴花制作 -->
+<section class="slide" id="slide-12" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 06 · 贴花制作</div><div class="r">12 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">DECAL PRODUCTION</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">贴花 <span style="font-weight:300;font-style:italic">制作方法</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center">
+      <div><div class="frame-img r-1x1" style="background:var(--grey-1)"><img src="img/img09.png" alt="Fig.07 贴花 · 4通道染色参数" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.07 贴花 · 4通道染色参数</span></div>
+      <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
+        <div class="card-fill"><div class="t-cat">原理</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">染色带<strong>自定义图案</strong>，贴图有 <strong>Alpha 通道</strong>，叠加到原本的贴图上。</p></div>
+        <div class="card-fill"><div class="t-cat">制作要点</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:clamp(4px,.8vh,8px);margin-top:clamp(6px,1vh,10px)">
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">▸</span> 图案区域使用 Alpha 通道控制透明度</li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">▸</span> 非图案区域 Alpha = 0</li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">▸</span> 叠加到染色区域上形成装饰效果</li>
+          </ul>
+        </div>
+        <div class="card-accent"><div class="t-cat" style="color:rgba(255,255,255,.78)">应用场景</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px);color:rgba(255,255,255,.86)">装饰条纹、logo 图案、纹理细节等需要在染色基础上叠加的自定义图案。</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>贴花</strong>是在染色基础上叠加自定义图案的方法。<br/><br/>原理：制作 Alpha 通道贴图，图案部分有颜色和非零 Alpha，非图案区域 Alpha=0，叠加到染色结果上。<br/><br/>常见应用：装饰条纹、logo、纹理细节。</div>
+
+<!-- S13 完整流程图 -->
+<section class="slide grey" id="slide-13" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">PIPELINE OVERVIEW · 完整流程</div><div class="r">13 / 14</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">END-TO-END WORKFLOW</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">从美术到引擎 <span style="font-weight:300;font-style:italic">完整管线</span></h2></div>
+    <div style="display:flex;flex-direction:column;gap:clamp(12px,3vh,30px);flex:1;justify-content:center">
+      <div class="flow-diagram">
+        <div class="flow-node"><div class="flow-node-box accent"><div class="t-cat" style="color:rgba(255,255,255,.78)">STEP 1</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px);color:rgba(255,255,255,.86)">模型拆分<br/>上衣/裤子/鞋子</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box"><div class="t-cat">STEP 2</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px)">遮罩图<br/>黑/红/绿/蓝</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box"><div class="t-cat">STEP 3</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px)">颜色设置<br/>3 种模式</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box"><div class="t-cat">STEP 4</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px)">渐变配置<br/>方向 / 贴图</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box"><div class="t-cat">STEP 5</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px)">HSL 微调<br/>色相/饱和度</p></div></div>
+      </div>
+      <div class="flow-diagram">
+        <div class="flow-node"><div class="flow-node-box ink"><div class="t-cat" style="color:rgba(255,255,255,.78)">STEP 6</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px);color:rgba(255,255,255,.86)">开启宏<br/>UES_DYEING</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box ink"><div class="t-cat" style="color:rgba(255,255,255,.78)">STEP 7</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px);color:rgba(255,255,255,.86)">程序参数<br/>_0 ~ _3</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box ink"><div class="t-cat" style="color:rgba(255,255,255,.78)">STEP 8</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px);color:rgba(255,255,255,.86)">引擎预览<br/>验证效果</p></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-box" style="border-color:var(--accent);border-width:3px"><div class="t-cat accent">STEP 9</div><p class="t-body-sm" style="margin-top:clamp(4px,.8vh,8px)">系统就绪<br/>策划可配方案</p></div></div>
+      </div>
+    </div>
+    <div class="t-meta" style="color:var(--text-helper)">美术设置 → 程序配置 → 引擎验证 · 共 9 步</div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>完整管线</strong>共 9 步：<br/><br/>美术阶段：1.模型拆分 2.遮罩图 3.颜色设置 4.渐变配置 5.HSL微调<br/>程序阶段：6.开启宏 7.配置参数 8.预览验证 9.完成</div>
+
+<!-- S14 总结 -->
+<section class="slide accent" id="slide-14" data-animate="split-statement">
+<div class="canvas-card" style="padding:0">
+  <div class="split-half">
+    <div class="half b-accent" style="justify-content:space-between;position:relative;overflow:hidden">
+      <canvas class="ascii-bg" aria-hidden="true"></canvas>
+      <div class="chrome-min" style="margin-bottom:0;position:relative;z-index:1"><div class="l">14 / 14</div><div class="r">SUMMARY</div></div>
+      <div style="display:flex;flex-direction:column;gap:clamp(8px,2vh,20px);position:relative;z-index:1">
+        <div class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em">DYE PIPELINE · KEY POINTS</div>
+        <h2 style="font-family:var(--sans),var(--sans-zh);font-size:clamp(2rem,7vw,7rem);line-height:.94;letter-spacing:-.025em;font-weight:200;color:#fff">pbr_dye<br/><span style="font-style:italic;font-weight:300">染色系统</span></h2>
+        <div style="font-family:var(--sans),var(--sans-zh);font-size:clamp(14px,1.05vw,16px);line-height:1.7;color:rgba(255,255,255,.86)">4 分区 · 3 模式 · 2 渐变<br/>每个区域独立 HSL + 材质调节</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:end;border-top:1px solid rgba(255,255,255,.22);padding-top:clamp(8px,2vh,20px);position:relative;z-index:1">
+        <p class="t-meta" style="color:rgba(255,255,255,.62);margin:0" data-object="text">陈斯远 · TA 团队 · WUZU</p>
+        <p class="t-meta" style="color:rgba(255,255,255,.62);margin:0" data-object="text">2026.05</p>
+      </div>
+    </div>
+    <div class="half" style="justify-content:space-between">
+      <div class="chrome-min"><div class="l">KEY TAKEAWAYS</div><div class="r">05 RULES</div></div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:clamp(8px,2vw,20px);align-items:start;padding:clamp(12px,2.6vh,26px) 0;border-top:1px solid rgba(127,127,127,.2)"><div style="font-family:var(--sans);font-weight:200;font-size:clamp(1.2rem,4.4vw,4.4rem);line-height:.9">01</div><div><h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:clamp(14px,1.8vw,18px);line-height:1.2;margin-bottom:clamp(4px,1vh,10px)">开启宏</h3><p class="t-body-sm">必须先开启 UES_DYEING 宏</p></div></div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:clamp(8px,2vw,20px);align-items:start;padding:clamp(12px,2.6vh,26px) 0;border-top:1px solid rgba(127,127,127,.2)"><div style="font-family:var(--sans);font-weight:200;font-size:clamp(1.2rem,4.4vw,4.4rem);line-height:.9">02</div><div><h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:clamp(14px,1.8vw,18px);line-height:1.2;margin-bottom:clamp(4px,1vh,10px)">4 分区遮罩</h3><p class="t-body-sm">黑/红/绿/蓝对应 4 个分区，Alpha 另用</p></div></div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:clamp(8px,2vw,20px);align-items:start;padding:clamp(12px,2.6vh,26px) 0;border-top:1px solid rgba(127,127,127,.2)"><div style="font-family:var(--sans);font-weight:200;font-size:clamp(1.2rem,4.4vw,4.4rem);line-height:.9">03</div><div><h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:clamp(14px,1.8vw,18px);line-height:1.2;margin-bottom:clamp(4px,1vh,10px)">3 种染色模式</h3><p class="t-body-sm">单色 / 双色渐变 / 多彩渐变（色环插值）</p></div></div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:clamp(8px,2vw,20px);align-items:start;padding:clamp(12px,2.6vh,26px) 0;border-top:1px solid rgba(127,127,127,.2)"><div style="font-family:var(--sans);font-weight:200;font-size:clamp(1.2rem,4.4vw,4.4rem);line-height:.9">04</div><div><h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:clamp(14px,1.8vw,18px);line-height:1.2;margin-bottom:clamp(4px,1vh,10px)">2 种渐变</h3><p class="t-body-sm">方向渐变（程序控制）和贴图渐变（美术控制）</p></div></div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:clamp(8px,2vw,20px);align-items:start;padding:clamp(12px,2.6vh,26px) 0;border-top:2px solid var(--accent-on);border-bottom:2px solid var(--accent-on)"><div style="font-family:var(--sans);font-weight:200;font-size:clamp(1.2rem,4.4vw,4.4rem);line-height:.9;color:var(--accent-on)">05</div><div><h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:clamp(14px,1.8vw,18px);line-height:1.2;margin-bottom:clamp(4px,1vh,10px);color:var(--accent-on)">1U 缩放偏移</h3><p class="t-body-sm" style="color:rgba(255,255,255,.78)">使用 1U 分区时，缩放偏移设为 1, 1, 0, 0</p></div></div>
+      </div>
+      <div class="t-meta" style="color:rgba(255,255,255,.5);text-align:right">→ 完 · END OF TUTORIAL</div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>总结</strong>——PBR 染色系统的 5 个核心要点：<br/><br/>1. 开启 UES_DYEING 宏  2. 遮罩图 RGB 4 分区  3. 3 种染色模式  4. 2 种渐变方式  5. 1U 分区时缩放偏移 1,1,0,0<br/><br/>感谢学习本教程。</div>
+
+</div><!-- #deck -->
+
+<!-- ==================== SCRIPTS ==================== -->
+<script type="module">
+/* ===== WebGL ===== */
+const VS=`attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
+const FS=`precision highp float;uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;uniform float u_dark;uniform vec3 u_accent;
+float gL(vec2 uv,float sp,float th){vec2 g=abs(fract(uv/sp)-0.5);float d=min(g.x,g.y);return 1.0-smoothstep(th-0.005,th+0.005,d);}
+void main(){vec2 uv=gl_FragCoord.xy/u_resolution.xy;float asp=u_resolution.x/u_resolution.y;vec2 p=uv;p.x*=asp;vec2 dr=vec2(u_time*0.008,u_time*0.005);vec2 gp=p+dr;float mg=gL(gp,0.12,0.012);float sg=gL(gp,0.024,0.04)*0.4;vec2 m=u_mouse;m.x*=asp;float ml=length(p-m);float mi=exp(-ml*4.0)*0.5;float gs=(mg+sg*0.5)*(0.45+mi);vec2 dg=fract(gp*50.0)-0.5;float dm=1.0-smoothstep(0.05,0.14,length(dg));float w=sin(gp.x*1.4+u_time*0.15)*cos(gp.y*1.6-u_time*0.12);dm*=smoothstep(-0.3,0.6,w)*0.6;vec3 lc=mix(vec3(0.08),vec3(0.92),u_dark);vec3 bg=mix(vec3(0.97,0.97,0.96),vec3(0.06,0.06,0.07),u_dark);vec3 c=bg;c=mix(c,lc,gs*0.55);c=mix(c,lc,dm*0.35);c=mix(c,u_accent,mi*0.18);gl_FragColor=vec4(c,1.0);}`;
+let mouse={x:0.5,y:0.5};
+addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=1-e.clientY/innerHeight});
+let gridCtrl=null,gridRAF=0;
+function bootGL(id,fs){const c=document.getElementById(id);const gl=c?.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:false});if(!gl)return ()=>false;
+const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};const pg=gl.createProgram();gl.attachShader(pg,mk(gl.VERTEX_SHADER,VS));gl.attachShader(pg,mk(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pg);gl.useProgram(pg);
+const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);const pos=gl.getAttribLocation(pg,'position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+const uR=gl.getUniformLocation(pg,'u_resolution'),uT=gl.getUniformLocation(pg,'u_time'),uM=gl.getUniformLocation(pg,'u_mouse'),uD=gl.getUniformLocation(pg,'u_dark'),uA=gl.getUniformLocation(pg,'u_accent');
+const rs=()=>{const d=Math.min(devicePixelRatio||1,2);c.width=innerWidth*d;c.height=innerHeight*d;gl.viewport(0,0,c.width,c.height);};addEventListener('resize',rs);rs();
+let ac=[0,0.18,0.65],dk=0;
+return(t,isDk)=>{if(isDk!==undefined)dk=isDk?1:0;const cs=getComputedStyle(document.documentElement);const h=cs.getPropertyValue('--accent').trim()||'#002FA7';const m2=h.match(/^#([0-9a-f]{6})$/i);if(m2){const n=parseInt(m2[1],16);ac=[((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255];}gl.uniform2f(uR,c.width,c.height);gl.uniform1f(uT,t);gl.uniform2f(uM,mouse.x,mouse.y);gl.uniform1f(uD,dk);gl.uniform3f(uA,ac[0],ac[1],ac[2]);gl.drawArrays(gl.TRIANGLES,0,6);return true;};}
+let darkMode=false;
+function startGrid(){if(window.__lowPowerMode||gridRAF)return;if(!gridCtrl)gridCtrl=bootGL('bg-grid',FS);if(!gridCtrl)return;let t0=Date.now();function lp(){if(window.__lowPowerMode){gridRAF=0;return;}gridCtrl((Date.now()-t0)/1000,darkMode);gridRAF=requestAnimationFrame(lp);}gridRAF=requestAnimationFrame(lp);}
+function stopGrid(){if(gridRAF)cancelAnimationFrame(gridRAF);gridRAF=0;}
+addEventListener('swiss-low-power-change',e=>{e.detail.on?stopGrid():startGrid();});
+startGrid();
+
+/* ===== IMAGE LOADING INDICATOR ===== */
+(function(){
+  document.querySelectorAll('.frame-img img').forEach(img=>{
+    const parent=img.closest('.frame-img');
+    if(parent&&!parent.classList.contains('loaded')){
+      const loader=document.createElement('div');
+      loader.className='img-loading';
+      loader.textContent='LOADING…';
+      parent.style.position='relative';
+      parent.insertBefore(loader,img);
+      if(img.complete&&img.naturalWidth>0){parent.classList.add('loaded');loader.remove();}
+      else{img.onload=()=>{parent.classList.add('loaded');loader.remove();};img.onerror=()=>{loader.textContent='NOT FOUND';};}
+    }
+  });
+})();
+
+/* ===== ASCII Canvas ===== */
+(function(){
+  const cvs=[...document.querySelectorAll('canvas.ascii-bg')];if(!cvs.length)return;
+  const P='   ...:::---+++***';const CL=16,FS=13;
+  function setup(c){const d=Math.min(devicePixelRatio||1,2);const r=c.getBoundingClientRect();if(r.width<4||r.height<4)return false;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);c._d=d;c._w=r.width;c._h=r.height;const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.font=`500 ${FS}px var(--mono),monospace`;ctx.textBaseline='top';c._ctx=ctx;return true;}
+  function draw(c,t){if(!c._ctx)return;const ctx=c._ctx,w=c._w,h=c._h;ctx.clearRect(0,0,w,h);const cols=Math.ceil(w/CL),rows=Math.ceil(h/CL);for(let r=0;r<rows;r++)for(let cc=0;cc<cols;cc++){const n=(Math.sin(cc*0.18+t)+Math.sin(r*0.24-t*0.7)+Math.sin((cc+r)*0.12+t*0.45))/4;const v=(n+1)/2;if(v<0.25)continue;const idx=Math.min(P.length-1,Math.floor(v*P.length));const ch=P[idx];if(ch===' ')continue;const a=0.08+(v-0.25)*0.5;ctx.fillStyle=`rgba(255,255,255,${a.toFixed(3)})`;ctx.fillText(ch,cc*CL,r*CL);}}
+  let t0=performance.now(),fr=0,raf=0,run=false;
+  function tick(now){if(!run||window.__lowPowerMode){run=false;raf=0;return;}const t=(now-t0)/1000*0.55;fr++;cvs.forEach(c=>{const sl=c.closest('.slide');const rc=sl?.getBoundingClientRect();if(rc&&rc.right>0&&rc.left<innerWidth&&(fr&3)===0)draw(c,t);});raf=requestAnimationFrame(tick);}
+  function start(){if(run||window.__lowPowerMode)return;cvs.forEach(setup);t0=performance.now();fr=0;run=true;raf=requestAnimationFrame(tick);}
+  function stop(){run=false;if(raf)cancelAnimationFrame(raf);raf=0;cvs.forEach(c=>{if(c._ctx)c._ctx.clearRect(0,0,c._w||0,c._h||0);});}
+  addEventListener('swiss-low-power-change',e=>{e.detail.on?stop():start();});
+  start();
+})();
+
+/* ===== EDITABLE DECK RUNTIME ===== */
+(function(){
+  const deck=document.getElementById('deck');
+  const slides=[...deck.querySelectorAll(':scope > section.slide')];
+  let total=slides.length;
+  const progressBar=document.getElementById('deckProgressBar');
+  const navDots=document.getElementById('deckNavDots');
+  const sidebar=document.getElementById('deckSidebar');
+  const sidebarList=document.getElementById('sidebarList');
+  const editChrome=document.getElementById('deckEditChrome');
+  const rteToolbar=document.getElementById('rteToolbar');
+  const slideCounter=document.getElementById('deckSlideCounter');
+  const addMenu=document.getElementById('deckAddElementMenu');
+  const speakerNotes=document.getElementById('speaker-notes');
+  const notesContent=document.getElementById('notes-content');
+
+  let currentIdx=0,editMode=false,sidebarOpen=false,notesVisible=false;
+  let selectedObjects=[],activeObject=null,isDragging=false,isResizing=false;
+  let dragStart={x:0,y:0,objStarts:[]};
+  let resizeStart={x:0,y:0,w:0,h:0,leftPct:0,topPct:0};
+  let historyStack=[],historyIdx=-1;
+  let oidCounter=0;
+  const SNAP_PX=8;
+  const STORAGE_KEY='pbr-dye-deck-state';
+
+  // Cursor crosshair tracker
+  const cursorH=document.getElementById('cursorH');
+  const cursorV=document.getElementById('cursorV');
+  const cursorPos=document.getElementById('cursorPos');
+  let crosshairRAF=0;
+  let mouseCanvas={x:0,y:0};
+  document.addEventListener('mousemove',e=>{
+    mouseCanvas.x=e.clientX;mouseCanvas.y=e.clientY;
+    if(!crosshairRAF){crosshairRAF=requestAnimationFrame(updateCrosshairs);}
+  });
+  function updateCrosshairs(){
+    crosshairRAF=0;
+    const hide=isDragging||isResizing;
+    if(cursorH){cursorH.style.display=hide?'none':'block';cursorH.style.top=mouseCanvas.y+'px';}
+    if(cursorV){cursorV.style.display=hide?'none':'block';cursorV.style.left=mouseCanvas.x+'px';}
+    if(cursorPos){cursorPos.style.display=hide?'none':'block';cursorPos.textContent=Math.round(mouseCanvas.x)+', '+Math.round(mouseCanvas.y);}
+  }
+
+  function genOid(){return 's'+currentIdx+'-o'+(oidCounter++);}
+
+  // Build nav dots
+  function buildNavDots(){
+    navDots.innerHTML='';
+    slides.forEach((s,i)=>{
+      const dot=document.createElement('button');
+      dot.className='deck-nav-dot';
+      dot.title='Slide '+(i+1);
+      dot.onclick=()=>goToSlide(i);
+      navDots.appendChild(dot);
+    });
+  }
+  buildNavDots();
+
+  // Build sidebar
+  function buildSidebar(){
+    sidebarList.innerHTML='';
+    slides.forEach((s,i)=>{
+      const thumb=document.createElement('div');
+      thumb.className='sidebar-thumb'+(i===currentIdx?' active':'');
+      thumb.dataset.idx=i;
+      const preview=document.createElement('div');
+      preview.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('dark')||s.classList.contains('accent')?'var(--ink)':'var(--paper)');
+      const clone=s.cloneNode(true);
+      clone.style.cssText='width:190px;height:'+Math.round(190*9/16)+'px;transform:scale('+(190/window.innerWidth)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
+      preview.appendChild(clone);
+      const label=document.createElement('div');
+      label.className='thumb-label';
+      label.innerHTML='<span>Page '+(i+1)+'</span><span class="thumb-actions"><button class="thumb-copy" title="Copy slide">\u29C9</button><button class="thumb-del" title="Delete slide">\u2715</button></span>';
+      thumb.appendChild(preview);thumb.appendChild(label);
+      thumb.onclick=e=>{if(!e.target.closest('.thumb-actions'))goToSlide(i);};
+      thumb.querySelector('.thumb-copy').onclick=e=>{e.stopPropagation();copySlide(i);};
+      thumb.querySelector('.thumb-del').onclick=e=>{e.stopPropagation();deleteSlide(i);};
+      thumb.draggable=true;
+      thumb.addEventListener('dragstart',e=>{thumb.classList.add('dragging');e.dataTransfer.setData('text/plain',i);});
+      thumb.addEventListener('dragend',()=>thumb.classList.remove('dragging'));
+      thumb.addEventListener('dragover',e=>{e.preventDefault();});
+      thumb.addEventListener('drop',e=>{
+        e.preventDefault();
+        const fromIdx=parseInt(e.dataTransfer.getData('text/plain'));
+        if(fromIdx!==i)reorderSlides(fromIdx,i);
+      });
+      sidebarList.appendChild(thumb);
+    });
+  }
+
+  function copySlide(idx){
+    const orig=slides[idx];
+    const copy=orig.cloneNode(true);
+    copy.querySelectorAll('[data-oid]').forEach(el=>el.setAttribute('data-oid',genOid()));
+    const notesEl=orig.nextElementSibling;
+    const hasNotes=notesEl&&notesEl.hasAttribute('data-notes');
+    if(hasNotes){const notesCopy=notesEl.cloneNode(true);deck.insertBefore(copy,orig.nextElementSibling);deck.insertBefore(notesCopy,copy.nextElementSibling);}
+    else{deck.insertBefore(copy,orig.nextElementSibling);}
+    syncSlides();buildSidebar();buildNavDots();
+  }
+
+  function deleteSlide(idx){
+    if(slides.length<=1){alert('Keep at least one slide.');return;}
+    if(!confirm('Delete slide '+(idx+1)+'?'))return;
+    const s=slides[idx];const notesEl=s.nextElementSibling;const hasNotes=notesEl&&notesEl.hasAttribute('data-notes');
+    deck.removeChild(s);if(hasNotes)deck.removeChild(notesEl);
+    syncSlides();buildSidebar();buildNavDots();
+    if(currentIdx>=slides.length)currentIdx=slides.length-1;
+    goToSlide(currentIdx);
+  }
+
+  function addNewPage(){
+    const current=slides[currentIdx];
+    const newSlide=document.createElement('section');
+    newSlide.className='slide';newSlide.id='slide-'+(slides.length+1);
+    if(current.classList.contains('accent'))newSlide.classList.add('accent');
+    else if(current.classList.contains('dark'))newSlide.classList.add('dark');
+    else if(current.classList.contains('grey'))newSlide.classList.add('grey');
+    const card=document.createElement('div');card.className='canvas-card';
+    const editLayer=document.createElement('div');editLayer.className='slide-edit-layer';editLayer.setAttribute('aria-hidden','true');card.appendChild(editLayer);
+    const title=document.createElement('h2');
+    title.style.cssText='font-family:var(--sans),var(--sans-zh);font-weight:300;font-size:clamp(1.4rem,4vw,3rem);';
+    title.textContent='New Slide';card.appendChild(title);
+    newSlide.appendChild(card);
+    const notesDiv=document.createElement('div');notesDiv.setAttribute('data-notes','');notesDiv.style.display='none';
+    current.after(newSlide);newSlide.after(notesDiv);
+    syncSlides();buildSidebar();buildNavDots();goToSlide(slides.length-1);
+  }
+
+  function reorderSlides(from,to){
+    const s=slides[from];
+    const notesEl=s.nextElementSibling;
+    const hasNotes=notesEl&&notesEl.hasAttribute('data-notes');
+    deck.removeChild(s);
+    if(hasNotes)deck.removeChild(notesEl);
+    const ref=slides[to];
+    if(to>from)deck.insertBefore(s,ref.nextElementSibling);
+    else deck.insertBefore(s,ref);
+    if(hasNotes){const next=ref.nextElementSibling?.hasAttribute('data-notes')?ref.nextElementSibling.nextElementSibling:ref.nextElementSibling;deck.insertBefore(notesEl,next||null);}
+    syncSlides();buildSidebar();buildNavDots();saveState();
+  }
+
+  function syncSlides(){
+    slides.length=0;
+    slides.push(...deck.querySelectorAll(':scope > section.slide'));
+    total=slides.length;
+    slides.forEach((s,i)=>{s.id='slide-'+(i+1);});
+  }
+
+  function goToSlide(n){
+    currentIdx=Math.max(0,Math.min(total-1,n));
+    const slide=slides[currentIdx];
+    if(!slide)return;
+    slide.scrollIntoView({behavior:'smooth'});
+    updateUI();updateNotes();buildNavDots();if(sidebarOpen)buildSidebar();
+  }
+
+  function updateUI(){
+    navDots.querySelectorAll('.deck-nav-dot').forEach((d,i)=>d.classList.toggle('active',i===currentIdx));
+    slideCounter.textContent=(currentIdx+1)+' / '+slides.length;
+    sidebarList.querySelectorAll('.sidebar-thumb').forEach((t,i)=>t.classList.toggle('active',i===currentIdx));
+    const pct=((currentIdx)/(slides.length-1))*100;
+    progressBar.style.width=pct+'%';
+    const isDark=slides[currentIdx]?.classList.contains('dark')||slides[currentIdx]?.classList.contains('accent');
+    document.body.classList.toggle('dark-bg',isDark);
+    darkMode=isDark;
+  }
+
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx=slides.indexOf(e.target);
+        if(idx>=0&&idx!==currentIdx){currentIdx=idx;updateUI();updateNotes();buildNavDots();if(sidebarOpen)buildSidebar();}
+      }
+    });
+  },{root:null,threshold:0.55});
+  slides.forEach(s=>observer.observe(s));
+
+  function updateNotes(){
+    const slide=slides[currentIdx];if(!slide)return;
+    const notesEl=slide.nextElementSibling;
+    if(notesEl&&notesEl.hasAttribute('data-notes')){notesContent.innerHTML=notesEl.getAttribute('data-notes');}
+    else{notesContent.innerHTML='<em style="opacity:.5">暂无讲解备注</em>';}
+  }
+
+  function setEditMode(on){
+    editMode=on;
+    document.body.classList.toggle('deck-edit-mode',on);
+    document.getElementById('btnEditMode').classList.toggle('active',on);
+    // Toggle crosshairs
+    if(cursorH)cursorH.style.display=on?'block':'none';
+    if(cursorV)cursorV.style.display=on?'block':'none';
+    if(cursorPos)cursorPos.style.display=on?'block':'none';
+    // Show/hide edit-only row
+    const hoverRowEdit=document.getElementById('hoverRowEdit');
+    if(hoverRowEdit)hoverRowEdit.style.display=on?'flex':'none';
+    if(!on){clearSelection();closeDrawers();}
+    if(!on&&sidebarOpen)toggleSidebar();
+    if(on){slides.forEach(s=>makeObjectsEditable(s));}
+  }
+
+  // Hover reveal for left cluster
+  let hoverTimer=null;
+  const leftHover=document.getElementById('deckLeftHover');
+  if(leftHover){
+    leftHover.addEventListener('mouseenter',()=>{clearTimeout(hoverTimer);leftHover.classList.add('show');});
+    leftHover.addEventListener('mouseleave',()=>{hoverTimer=setTimeout(()=>leftHover.classList.remove('show'),400);});
+  }
+
+  function toggleSidebar(){
+    sidebarOpen=!sidebarOpen;
+    document.body.classList.toggle('sidebar-open',sidebarOpen);
+    document.getElementById('btnSidebar').classList.toggle('active',sidebarOpen);
+    if(sidebarOpen)buildSidebar();
+  }
+
+  function getSlideEditLayer(slide){
+    let layer=slide.querySelector('.slide-edit-layer');
+    if(!layer){
+      layer=document.createElement('div');
+      layer.className='slide-edit-layer';
+      layer.setAttribute('aria-hidden','true');
+      const canvasCard=slide.querySelector('.canvas-card');
+      if(canvasCard)canvasCard.appendChild(layer);
+      else slide.appendChild(layer);
+    }
+    return layer;
+  }
+
+  function ensureObjectControls(obj){
+    if(!obj.querySelector('.slide-object-move')){
+      const mh=document.createElement('button');
+      mh.type='button';mh.className='slide-object-move';
+      mh.setAttribute('aria-label','Move object');mh.title='Drag to move';
+      mh.textContent='\u2807';
+      obj.insertBefore(mh,obj.firstChild);
+    }
+    if(!obj.querySelector('.slide-object-delete')){
+      const db=document.createElement('button');
+      db.type='button';db.className='slide-object-delete';
+      db.setAttribute('aria-label','Delete object');db.title='Delete';
+      db.textContent='\u00D7';
+      db.addEventListener('click',e=>{e.stopPropagation();deleteObject(obj);});
+      obj.appendChild(db);
+    }
+    if(!obj.querySelector('.slide-object-resize')){
+      const rh=document.createElement('button');
+      rh.type='button';rh.className='slide-object-resize';
+      rh.setAttribute('aria-label','Resize');
+      obj.appendChild(rh);
+    }
+    if(!obj.getAttribute('data-oid')){
+      obj.setAttribute('data-oid',genOid());
+    }
+  }
+
+  /* ===== Non-destructive editing: select elements directly, no DOM wrapping ===== */
+  function makeObjectsEditable(slide){
+    // No wrapping needed. Elements are selected directly via click delegation below.
+  }
+
+  function _isContentEl(el){
+    // Return the nearest content element to select
+    if(!el)return null;
+    const contentSel='h1,h2,h3,h4,p,table,ul,ol,.frame-img,.card-fill,.mode-card,.channel-box,.card-accent,.card-ink,.flow-node,.flow-arrow,img';
+    const match=el.closest(contentSel);
+    if(match)return match;
+    return null;
+  }
+
+  function selectObject(obj,e){
+    if(!editMode||!obj)return;
+    if(e?.ctrlKey||e?.metaKey){
+      if(obj.classList.contains('is-selected')){obj.classList.remove('is-selected');selectedObjects=selectedObjects.filter(o=>o!==obj);}
+      else{obj.classList.add('is-selected');selectedObjects.push(obj);}
+    }else{
+      clearSelection();
+      obj.classList.add('is-selected');
+      selectedObjects=[obj];
+    }
+    activeObject=selectedObjects[selectedObjects.length-1]||null;
+    if(activeObject)showRTEToolbar(activeObject);
+  }
+
+  function clearSelection(){
+    selectedObjects.forEach(o=>{o.classList.remove('is-selected');o.classList.remove('is-multi');});
+    selectedObjects=[];activeObject=null;
+    rteToolbar.classList.remove('visible');
+  }
+
+  function showRTEToolbar(obj){
+    if(!obj)return;
+    const type=obj.getAttribute('data-object-type');
+    const isTextObj=type==='text'||obj.matches('p,h1,h2,h3,h4,li,.t-body,.t-body-sm,.t-h-prod');
+    if(!isTextObj){rteToolbar.classList.remove('visible');return;}
+    const rect=obj.getBoundingClientRect();
+    rteToolbar.style.top=Math.max(40,rect.top-48)+'px';
+    rteToolbar.style.left=Math.min(rect.left,innerWidth-220)+'px';
+    rteToolbar.classList.add('visible');
+  }
+
+  function _positionPct(el,slide,prop){
+    const v=el.style[prop];
+    if(v&&v.includes('%')){const n=parseFloat(v);return isNaN(n)?0:n;}
+    const sr=slide.getBoundingClientRect();
+    const er=el.getBoundingClientRect();
+    if(prop==='left')return((er.left-sr.left)/sr.width*100);
+    if(prop==='top')return((er.top-sr.top)/sr.height*100);
+    return 0;
+  }
+
+  function checkSnapV(leftPx,obj,slideRect){
+    const snaps=[slideRect.width/2-obj.offsetWidth/2];
+    for(const s of snaps){if(Math.abs(leftPx-s)<SNAP_PX)return s;}
+    return null;
+  }
+
+  function checkSnapH(topPx,obj,slideRect){
+    const snaps=[slideRect.height/2-obj.offsetHeight/2];
+    for(const s of snaps){if(Math.abs(topPx-s)<SNAP_PX)return s;}
+    return null;
+  }
+
+  function startDragMove(handle,e){
+    if(!editMode)return;
+    e.preventDefault();
+    const obj=handle.closest('.slide-object');
+    if(!obj)return;
+    selectObject(obj,e);
+    isDragging=true;
+    dragStart={x:e.clientX,y:e.clientY};
+    const slideRect=obj.closest('.slide').getBoundingClientRect();
+    dragStart.objStarts=selectedObjects.map(o=>({
+      el:o,
+      leftPct:_positionPct(o,o.closest('.slide'),'left'),
+      topPct:_positionPct(o,o.closest('.slide'),'top'),
+      slideW:slideRect.width,slideH:slideRect.height
+    }));
+    document.addEventListener('mousemove',onDragMove);
+    document.addEventListener('mouseup',endDragMove);
+  }
+
+  function onDragMove(e){
+    if(!isDragging)return;
+    const dx=e.clientX-dragStart.x;
+    const dy=e.clientY-dragStart.y;
+    const primary=dragStart.objStarts[0];
+    const sr={width:primary.slideW,height:primary.slideH};
+    dragStart.objStarts.forEach(s=>{
+      let newLeftPct=s.leftPct+(dx/s.slideW*100);
+      let newTopPct=s.topPct+(dy/s.slideH*100);
+      // Convert to px for snap check
+      const leftPx=newLeftPct/100*s.slideW;
+      const topPx=newTopPct/100*s.slideH;
+      const snapV=checkSnapV(leftPx,s.el,sr);
+      const snapH=checkSnapH(topPx,s.el,sr);
+      if(snapV!==null)newLeftPct=snapV/s.slideW*100;
+      if(snapH!==null)newTopPct=snapH/s.slideH*100;
+      s.el.style.left=newLeftPct.toFixed(1)+'%';
+      s.el.style.top=newTopPct.toFixed(1)+'%';
+    });
+  }
+
+  function endDragMove(){
+    if(isDragging)saveState();
+    isDragging=false;
+    document.removeEventListener('mousemove',onDragMove);
+    document.removeEventListener('mouseup',endDragMove);
+  }
+
+  function startResize(handle,e){
+    if(!editMode||!activeObject)return;
+    e.preventDefault();e.stopPropagation();
+    isResizing=true;
+    const slideRect=activeObject.closest('.slide').getBoundingClientRect();
+    resizeStart={
+      x:e.clientX,y:e.clientY,
+      w:activeObject.offsetWidth,h:activeObject.offsetHeight,
+      leftPct:_positionPct(activeObject,activeObject.closest('.slide'),'left'),
+      topPct:_positionPct(activeObject,activeObject.closest('.slide'),'top'),
+      slideW:slideRect.width,slideH:slideRect.height
+    };
+    document.addEventListener('mousemove',onResize);
+    document.addEventListener('mouseup',endResize);
+  }
+
+  function onResize(e){
+    if(!isResizing||!activeObject)return;
+    const dx=e.clientX-resizeStart.x;
+    const dy=e.clientY-resizeStart.y;
+    const ow=Math.max(40,resizeStart.w+dx);
+    const oh=Math.max(20,resizeStart.h+dy);
+    activeObject.style.width=(ow/resizeStart.slideW*100).toFixed(1)+'%';
+    activeObject.style.height=(oh/resizeStart.slideH*100).toFixed(1)+'%';
+  }
+
+  function endResize(){
+    if(isResizing)saveState();
+    isResizing=false;
+    document.removeEventListener('mousemove',onResize);
+    document.removeEventListener('mouseup',endResize);
+  }
+
+  function deleteObject(obj){
+    if(!editMode)return;
+    obj.remove();
+    if(selectedObjects.includes(obj)){selectedObjects=selectedObjects.filter(o=>o!==obj);if(selectedObjects.length===0)activeObject=null;rteToolbar.classList.remove('visible');}
+    saveState();
+  }
+
+  function addElement(type){
+    if(!editMode||!slides[currentIdx])return;
+    const layer=getSlideEditLayer(slides[currentIdx]);
+    const obj=document.createElement('div');
+    obj.className='slide-object';
+    obj.setAttribute('data-slide-object','');
+    obj.setAttribute('data-oid',genOid());
+    obj.setAttribute('data-object-type',type);
+    obj.style.cssText='left:10%;top:20%;width:50%;';
+    if(type==='text'){
+      obj.innerHTML='<div class="slide-object-text" contenteditable="false">New text element</div>';
+    }else if(type==='image'){
+      obj.innerHTML='<div class="slide-object-graphic slide-object-graphic--empty"><label style="cursor:pointer;font-size:12px;color:var(--deck-chrome-muted)">Choose Image<input type="file" accept="image/*" style="display:none" onchange="window._handleImagePick(this)"></label></div>';
+      obj.style.height='20vh';
+    }else if(type==='video'){
+      obj.innerHTML='<div class="slide-object-graphic slide-object-graphic--empty"><label style="cursor:pointer;font-size:12px;color:var(--deck-chrome-muted)">Choose Video<input type="file" accept="video/*" style="display:none" onchange="window._handleVideoPick(this)"></label></div>';
+      obj.style.height='20vh';
+    }
+    layer.appendChild(obj);ensureObjectControls(obj);
+    clearSelection();selectObject(obj);
+    saveState();
+    addMenu.classList.remove('visible');
+  }
+
+  window._handleImagePick=function(input){
+    const file=input.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const obj=input.closest('.slide-object');const graphic=obj.querySelector('.slide-object-graphic');
+      graphic.classList.remove('slide-object-graphic--empty');
+      graphic.innerHTML='<img src="'+e.target.result+'" alt="" style="width:100%;height:100%;object-fit:contain;pointer-events:none;">';
+      saveState();
+    };reader.readAsDataURL(file);
+  };
+  window._handleVideoPick=function(input){
+    const file=input.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const obj=input.closest('.slide-object');const graphic=obj.querySelector('.slide-object-graphic');
+      graphic.classList.remove('slide-object-graphic--empty');
+      graphic.innerHTML='<video src="'+e.target.result+'" controls style="pointer-events:auto;width:100%;height:100%"></video>';
+      saveState();
+    };reader.readAsDataURL(file);
+  };
+
+  function execRTE(cmd,val){document.execCommand(cmd,false,val||null);if(activeObject)saveState();}
+
+  // RTE drawers
+  function closeDrawers(){
+    rteToolbar.querySelectorAll('.rte-drawer').forEach(d=>d.classList.remove('open'));
+    rteToolbar.querySelectorAll('.drawer-trigger').forEach(b=>b.classList.remove('is-active'));
+  }
+  rteToolbar.querySelectorAll('.drawer-trigger').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const drawerId='drawer'+btn.dataset.drawer.charAt(0).toUpperCase()+btn.dataset.drawer.slice(1);
+      const drawer=document.getElementById(drawerId);if(!drawer)return;
+      const isOpen=drawer.classList.contains('open');
+      closeDrawers();
+      if(!isOpen){drawer.classList.add('open');btn.classList.add('is-active');}
+    });
+  });
+  // Font buttons
+  rteToolbar.querySelectorAll('[data-font]').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>{e.preventDefault();execRTE('fontName',btn.dataset.font);});
+  });
+  // Scale buttons
+  rteToolbar.querySelectorAll('[data-size-factor]').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>{
+      e.preventDefault();const f=parseFloat(btn.dataset.sizeFactor);
+      const sel=window.getSelection();
+      if(sel.rangeCount){const span=document.createElement('span');span.style.fontSize=`clamp(${Math.round(12*f)}px, ${Math.round(1.3*f)}vw, ${Math.round(18*f)}px)`;sel.getRangeAt(0).surroundContents(span);}
+    });
+  });
+  // Px buttons
+  rteToolbar.querySelectorAll('[data-size-px]').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const sel=window.getSelection();
+      if(sel.rangeCount){const span=document.createElement('span');span.style.fontSize=btn.dataset.sizePx+'px';sel.getRangeAt(0).surroundContents(span);}
+    });
+  });
+  // Custom px
+  const customApply=document.getElementById('rteCustomApply');
+  const customCancel=document.getElementById('rteCustomCancel');
+  if(customApply)customApply.addEventListener('mousedown',e=>{
+    e.preventDefault();const v=parseInt(document.getElementById('rteCustomPx').value);
+    if(v>=8&&v<=400){const sel=window.getSelection();if(sel.rangeCount){const span=document.createElement('span');span.style.fontSize=v+'px';sel.getRangeAt(0).surroundContents(span);}}
+  });
+  if(customCancel)customCancel.addEventListener('mousedown',e=>{e.preventDefault();closeDrawers();});
+  // Close drawers on outside click
+  document.addEventListener('mousedown',e=>{if(!e.target.closest('.rte-toolbar'))closeDrawers();});
+
+  // Text editing: single-click to edit text elements directly
+  // Non-text elements (images, cards, etc.) still use selection outline
+  function _isTextEl(el){
+    if(!el)return null;
+    const textSel='h1,h2,h3,h4,p,li,.t-body,.t-body-sm,.t-h-prod,.t-cat,.t-meta';
+    return el.closest(textSel);
+  }
+  function startTextEditing(textEl){
+    if(!textEl||!_isContentEl(textEl))return;
+    // Blur any other editing element first
+    const prev=document.querySelector('[contenteditable="true"]');
+    if(prev){prev.setAttribute('contenteditable','false');prev.style.cursor='';}
+    textEl.setAttribute('contenteditable','true');
+    textEl.style.cursor='text';
+    textEl.focus();
+    const range=document.createRange();
+    range.selectNodeContents(textEl);
+    const sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    showRTEToolbar(textEl);
+  }
+  // Focus text element for editing without selecting all — cursor placed at click position
+  function focusTextAtCursor(textEl){
+    if(!textEl||!_isContentEl(textEl))return;
+    const prev=document.querySelector('[contenteditable="true"]');
+    if(prev){prev.setAttribute('contenteditable','false');prev.style.cursor='';}
+    textEl.setAttribute('contenteditable','true');
+    textEl.style.cursor='text';
+    textEl.focus();
+    showRTEToolbar(textEl);
+  }
+  document.addEventListener('dblclick',e=>{
+    if(!editMode)return;
+    const textEl=_isTextEl(e.target);
+    if(textEl&&_isContentEl(textEl)&&!textEl.closest('.slide-edit-layer')){
+      e.preventDefault();
+      startTextEditing(textEl);
+    }
+  });
+  // Commit text on focusout
+  document.addEventListener('focusout',e=>{
+    if(e.target.getAttribute('contenteditable')==='true'&&!e.relatedTarget?.closest('.rte-toolbar')){
+      e.target.setAttribute('contenteditable','false');
+      e.target.style.cursor='';
+      rteToolbar.classList.remove('visible');
+      saveState();
+    }
+  });
+
+  function saveState(){
+    const state=getDeckState();
+    historyStack=historyStack.slice(0,historyIdx+1);
+    historyStack.push(JSON.stringify(state));
+    historyIdx=historyStack.length-1;
+    if(historyStack.length>50){historyStack.shift();historyIdx--;}
+    updateUndoRedoButtons();
+  }
+
+  function getDeckState(){
+    return{
+      slides:slides.map(s=>s.outerHTML),
+      notes:[...document.querySelectorAll('[data-notes]')].map(n=>n.outerHTML)
+    };
+  }
+
+  function undo(){if(historyIdx>0){historyIdx--;restoreState(historyIdx);updateUndoRedoButtons();}}
+  function redo(){if(historyIdx<historyStack.length-1){historyIdx++;restoreState(historyIdx);updateUndoRedoButtons();}}
+  function updateUndoRedoButtons(){
+    const ub=document.getElementById('btnUndo');const rb=document.getElementById('btnRedo');
+    if(ub)ub.disabled=(historyIdx<=0);
+    if(rb)rb.disabled=(historyIdx>=historyStack.length-1);
+    if(ub)ub.style.opacity=(historyIdx<=0)?'.4':'1';
+    if(rb)rb.style.opacity=(historyIdx>=historyStack.length-1)?'.4':'1';
+  }
+
+  function restoreState(idx){
+    if(idx<0||idx>=historyStack.length)return;
+    historyIdx=idx;
+    try{
+      const state=JSON.parse(historyStack[idx]);
+      // Clear current deck content
+      slides.forEach(s=>{const notesEl=s.nextElementSibling;if(notesEl&&notesEl.hasAttribute('data-notes'))deck.removeChild(notesEl);deck.removeChild(s);});
+      // Restore slides
+      state.slides.forEach((html,i)=>{
+        const tmp=document.createElement('div');tmp.innerHTML=html;
+        const slideEl=tmp.firstElementChild;
+        if(slideEl)deck.appendChild(slideEl);
+        if(state.notes&&state.notes[i]){
+          const tmp2=document.createElement('div');tmp2.innerHTML=state.notes[i];
+          const notesEl=tmp2.firstElementChild;
+          if(notesEl&&notesEl.hasAttribute('data-notes'))deck.appendChild(notesEl);
+        }
+      });
+      syncSlides();buildSidebar();buildNavDots();goToSlide(Math.min(currentIdx,slides.length-1));
+    }catch(e){console.warn('restoreState failed:',e);}
+  }
+
+  function exportHTML(){
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelectorAll('#deckLeftHover,#deckEditChrome,#deckProgressBar,#deckNavDots,#deckSidebar,.rte-toolbar,#deckAddElementMenu,.snap-guide,.slide-edit-layer').forEach(el=>el.remove());
+    clone.querySelectorAll('.slide-object').forEach(el=>{
+      el.removeAttribute('data-slide-object');el.removeAttribute('data-oid');
+      el.classList.remove('slide-object','is-selected','is-multi');
+      el.querySelectorAll('.slide-object-move,.slide-object-delete,.slide-object-resize').forEach(b=>b.remove());
+      el.style.position='';el.style.left='';el.style.top='';el.style.cursor='';
+    });
+    clone.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+    clone.querySelectorAll('[data-deck-chrome]').forEach(el=>el.removeAttribute('data-deck-chrome'));
+    clone.body.classList.remove('deck-edit-mode','sidebar-open');
+    const html='<!DOCTYPE html>\n'+clone.outerHTML;
+    const blob=new Blob([html],{type:'text/html'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='pbr-dye-system.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function showToast(msg,duration){
+    let t=document.getElementById('deckToast');
+    if(!t){t=document.createElement('div');t.id='deckToast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(255,152,0,0.95);color:#1a1a2e;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;pointer-events:none;opacity:0;transition:opacity 0.2s;';document.body.appendChild(t);}
+    t.textContent=msg;t.style.opacity='1';
+    clearTimeout(t._timer);
+    t._timer=setTimeout(()=>{t.style.opacity='0';},duration||1500);
+  }
+  function saveToStorage(){
+    // First commit any pending edits (blur contenteditable)
+    const ce=document.querySelector('[contenteditable="true"]');
+    if(ce){ce.setAttribute('contenteditable','false');ce.style.cursor='';rteToolbar.classList.remove('visible');}
+    try{
+      const state=getDeckState();
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+      showToast('✓ Saved to browser cache');
+    }catch(e){console.warn('Save failed:',e);showToast('✗ Save failed',2000);}
+  }
+
+  // Keyboard
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveToStorage();return;}
+    if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();if(editMode)undo();return;}
+    if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();if(editMode)redo();return;}
+    if((e.ctrlKey||e.metaKey)&&e.key==='a'&&editMode){
+      e.preventDefault();
+      const layer=slides[currentIdx]?.querySelector('.slide-edit-layer');
+      if(layer){clearSelection();layer.querySelectorAll('.slide-object').forEach(o=>{o.classList.add('is-selected');selectedObjects.push(o);});if(selectedObjects.length)activeObject=selectedObjects[selectedObjects.length-1];}
+      return;
+    }
+    if(e.key==='Delete'&&editMode&&selectedObjects.length){
+      e.preventDefault();selectedObjects.forEach(o=>o.remove());clearSelection();saveState();return;
+    }
+    // E toggle edit mode
+    if(e.key==='e'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&document.activeElement?.getAttribute('contenteditable')!=='true'){
+      e.preventDefault();setEditMode(!editMode);return;
+    }
+    if(e.key==='Escape'){
+      if(addMenu.classList.contains('visible')){addMenu.classList.remove('visible');return;}
+      if(notesVisible){notesVisible=false;speakerNotes.classList.remove('visible');return;}
+      // Exit text editing + exit edit mode in one Esc
+      if(document.activeElement?.getAttribute('contenteditable')==='true'){document.activeElement.blur();document.activeElement.setAttribute('contenteditable','false');}
+      if(editMode){setEditMode(false);return;}
+      return;
+    }
+    if(e.key==='s'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+      e.preventDefault();notesVisible=!notesVisible;speakerNotes.classList.toggle('visible',notesVisible);
+      if(notesVisible)updateNotes();return;
+    }
+    if(e.key==='b'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();window.__setLowPowerMode(!window.__lowPowerMode);return;}
+    if(document.activeElement?.getAttribute('contenteditable')==='true')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();goToSlide(currentIdx+1);return;}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();goToSlide(currentIdx-1);return;}
+    if(e.key==='Home'){e.preventDefault();goToSlide(0);return;}
+    if(e.key==='End'){e.preventDefault();goToSlide(slides.length-1);return;}
+  });
+
+  // Event delegation: select content elements directly
+  document.addEventListener('mousedown',e=>{
+    if(e.target.closest('#deckLeftHover')||e.target.closest('#deckEditChrome')||e.target.closest('.rte-toolbar')||e.target.closest('#deckAddElementMenu')||e.target.closest('#deckSidebar')||e.target.closest('.deck-nav-dot'))return;
+    // Move handle (for previously-created slide-objects)
+    const moveHandle=e.target.closest('.slide-object-move');
+    if(moveHandle){startDragMove(moveHandle,e);return;}
+    const resizeHandle=e.target.closest('.slide-object-resize');
+    if(resizeHandle){startResize(resizeHandle,e);return;}
+    // Existing slide-object
+    const slideObj=e.target.closest('.slide-object');
+    if(slideObj&&editMode){e.preventDefault();selectObject(slideObj,e);return;}
+    // Direct content element selection
+    if(editMode){
+      const contentEl=_isContentEl(e.target);
+      if(contentEl&&!contentEl.closest('.slide-edit-layer')){
+        e.preventDefault();
+        const textEl=_isTextEl(e.target);
+        if(textEl){focusTextAtCursor(textEl);return;}  // Text: click → focus at cursor, no select-all
+        selectObject(contentEl,e);return;  // Non-text: click → select (outline)
+      }
+      if(e.target.closest('.slide')){clearSelection();}
+    }
+  });
+
+  // Button handlers
+  document.getElementById('btnEditMode').onclick=()=>setEditMode(!editMode);
+  document.getElementById('btnSidebar').onclick=()=>toggleSidebar();
+  document.getElementById('btnCloseSidebar').onclick=()=>toggleSidebar();
+  document.getElementById('btnUndo').onclick=undo;
+  document.getElementById('btnRedo').onclick=redo;
+  document.getElementById('btnSave').onclick=saveToStorage;
+  document.getElementById('btnDone').onclick=()=>setEditMode(false);
+  document.getElementById('btnAddElement').onclick=e=>{
+    e.stopPropagation();
+    const rect=e.target.getBoundingClientRect();
+    addMenu.style.top=(rect.bottom+4)+'px';
+    addMenu.style.left=rect.left+'px';
+    addMenu.classList.toggle('visible');
+  };
+  document.getElementById('btnExport').onclick=exportHTML;
+  document.getElementById('btnExportSidebar').onclick=exportHTML;
+  document.getElementById('btnNewPage').onclick=addNewPage;
+  addMenu.querySelectorAll('button').forEach(b=>b.onclick=()=>addElement(b.dataset.addType));
+  rteToolbar.querySelectorAll('[data-cmd]').forEach(b=>{
+    b.addEventListener('mousedown',e=>{e.preventDefault();execRTE(b.dataset.cmd);});
+  });
+
+  document.addEventListener('mousedown',e=>{
+    if(!e.target.closest('#deckAddElementMenu')&&!e.target.closest('#btnAddElement'))addMenu.classList.remove('visible');
+  });
+
+  // Wheel navigation (disabled in edit mode)
+  let wheelAcc=0,wheelTO=null;
+  document.addEventListener('wheel',e=>{
+    if(editMode)return;
+    wheelAcc+=e.deltaY+e.deltaX;
+    if(Math.abs(wheelAcc)>80){goToSlide(currentIdx+(wheelAcc>0?1:-1));wheelAcc=0;}
+    clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+  },{passive:true});
+
+  // Init
+  goToSlide(0);
+  setTimeout(()=>saveState(),500);
+  updateUndoRedoButtons();
+
+  window.__deckGoTo=goToSlide;
+  window.__deckEdit={getEditMode:()=>editMode,setEditMode,exportHTML,saveToStorage};
+})();
+
+/* ===== Motion Animations ===== */
+let motion;
+try{motion=await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm');}catch(e){console.warn('[motion] failed',e);}
+if(motion){
+  const{animate}=motion;
+  const EASE_PROD=[.2,0,.38,.9];const EASE_EXP=[0,0,.3,1];
+  const allSlides=[...document.querySelectorAll('.slide')];
+  function fade(el,opts={}){animate(el,{opacity:[0,1],y:[opts.y??12,0]},{duration:opts.duration??.6,delay:opts.delay??0,easing:opts.easing??EASE_EXP});}
+  function resetSlide(slide){slide.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none';});}
+  function playSlide(i){
+    const slide=allSlides[i];if(!slide)return;
+    if(window.__lowPowerMode){resetSlide(slide);return;}
+    resetSlide(slide);
+    const head=slide.querySelector('.t-cat');if(head)fade(head,{duration:.5,y:6});
+    const title=slide.querySelector('h2,h1');if(title)fade(title,{duration:.8,y:16,delay:.2});
+    const cards=[...slide.querySelectorAll('.card-fill,.mode-card,.flow-node-box')];
+    cards.forEach((c,j)=>fade(c,{duration:.5,delay:.3+j*.1,y:14}));
+  }
+  // Observe slides
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){const idx=allSlides.indexOf(e.target);if(idx>=0)playSlide(idx);}});
+  },{threshold:0.5});
+  allSlides.forEach(s=>obs.observe(s));
+  // Play initial
+  setTimeout(()=>playSlide(0),300);
+}
+</script>
+</body>
+</html>

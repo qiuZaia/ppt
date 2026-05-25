@@ -1,0 +1,5 @@
+# Test files
+test_*.mjs
+test_*.png
+update_images.js
+fix_editor.py
