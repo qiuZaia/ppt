@@ -318,7 +318,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 
 <!-- Secondary edit chrome (slide counter + export) -->
 <div id="deckEditChrome">
-  <span class="slide-counter" id="deckSlideCounter">1 / 14</span>
+  <span class="slide-counter" id="deckSlideCounter">1 / 16</span>
   <div class="spacer"></div>
   <button id="btnExport" title="Export HTML">↓ Export</button>
 </div>
@@ -391,7 +391,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S01 封面 -->
 <section class="slide hero accent" id="slide-1" data-animate="hero">
 <div class="canvas-card"><canvas class="ascii-bg" aria-hidden="true"></canvas>
-  <div class="chrome-min" data-deck-chrome="1" style="color:rgba(255,255,255,.62)"><div class="l">PBR 染色系统 · 教学手册</div><div class="r">2026.05 · 01 / 14</div></div>
+  <div class="chrome-min" data-deck-chrome="1" style="color:rgba(255,255,255,.62)"><div class="l">PBR 染色系统 · 教学手册</div><div class="r">2026.05 · 01 / 16</div></div>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(12px,2.6vh,26px)">
     <div class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em" data-deck-chrome="1">PBR DYEING SYSTEM · TUTORIAL</div>
     <h1 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(2.5rem,10vw,10rem);line-height:.96;letter-spacing:-.025em;color:#fff" data-object="title">PBR 染色<br/><span style="font-style:italic;font-weight:300">系统教学</span></h1>
@@ -408,7 +408,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S02 目录 -->
 <section class="slide" id="slide-2" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CONTENTS · 课程目录</div><div class="r">02 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CONTENTS · 课程目录</div><div class="r">02 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
     <div><div class="t-cat">WHAT YOU'LL LEARN</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.8rem,5.2vw,5.2rem);line-height:1.05;letter-spacing:-.025em">课程<span style="font-weight:300;font-style:italic">大纲</span></h2></div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,2.4vh,24px) clamp(12px,2.4vw,24px);align-content:start">
@@ -417,17 +417,18 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
       <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">03</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">颜色控制</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">3 种染色模式详解</p></div>
       <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">04</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">渐变方式</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">方向渐变 vs 贴图渐变</p></div>
       <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">05</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">程序参数</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">整体参数 + 区域参数完整说明</p></div>
-      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">06</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">贴花制作</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">自定义图案叠加方法</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">06</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">引擎材质</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">pbr_dye 材质设置与资源上传规范</p></div>
+      <div class="card-fill"><div style="font-family:var(--mono);font-size:clamp(18px,2.2vw,40px);font-weight:200;color:var(--accent);line-height:1">07</div><h4 class="t-h-prod" style="margin-top:clamp(4px,.8vh,8px)">贴花制作</h4><p class="t-body-sm" style="margin-top:clamp(4px,.6vh,6px)">自定义图案叠加方法</p></div>
     </div>
   </div>
 </div>
 </section>
-<div data-notes>本课程分为 6 个章节。从 Shader 基础概念开始，逐步深入到分区、颜色控制、渐变方式，最后讲解程序参数和贴花制作。</div>
+<div data-notes>本课程分为 7 个章节。从 Shader 基础概念开始，逐步深入到分区、颜色控制、渐变方式，再到引擎材质设置，最后讲解程序参数和贴花制作。</div>
 
 <!-- S03 Shader 概述 -->
 <section class="slide" id="slide-3" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 01 · Shader 概述</div><div class="r">03 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 01 · Shader 概述</div><div class="r">03 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
     <div><div class="t-cat">PBR_DYE SHADER</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,5vw,5rem);line-height:1.05;letter-spacing:-.025em">pbr_dye <span style="font-weight:300;font-style:italic">染色着色器</span></h2></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:start">
@@ -442,7 +443,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
           </ul>
         </div>
       </div>
-      <div><div class="frame-img r-4x3" style="background:var(--grey-1)"><img src="img/img01.png" alt="Fig.01 渲染控制中开启染色" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.01 渲染控制中开启染色</span></div>
+      <div><div class="frame-img r-4x3" style="background:var(--grey-1)"><img src="img/popo_img01.png" alt="Fig.01 本体 vs 晕染款" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.01 本体 vs 晕染款（左本体，右晕染）</span></div>
     </div>
   </div>
 </div>
@@ -452,7 +453,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S04 染色分区 -->
 <section class="slide" id="slide-4" data-animate="grid-reveal">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 02 · 染色分区</div><div class="r">04 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 02 · 染色分区</div><div class="r">04 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
     <div><div class="t-cat">DYE PARTITIONING · 遮罩分区</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">通过遮罩图控制 <span style="font-weight:300;font-style:italic">4 个分区</span></h2></div>
     <p class="t-body" style="opacity:.78">同一个材质支持 4 个分区，分别是遮罩图中的<strong>黑色</strong>、<strong>红色</strong>、<strong>绿色</strong>和<strong>蓝色</strong>区域。<br/><span style="color:var(--accent)">注意：Alpha 通道另有用处（贴图渐变时使用），不参与分区。</span></p>
@@ -474,11 +475,11 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S05 分区示意 -->
 <section class="slide grey" id="slide-5" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">分区示意 · MASK PREVIEW</div><div class="r">05 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">分区示意 · MASK PREVIEW</div><div class="r">05 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
     <div><div class="t-cat">VISUAL REFERENCE</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">遮罩图<span style="font-weight:300;font-style:italic">效果示意</span></h2></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center;flex:1">
-      <div><div class="frame-img r-1x1" style="background:var(--grey-1)"><img src="img/img02.png" alt="Fig.02 遮罩图分区示意（4 色分区）" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.02 遮罩图分区示意（4 色分区）</span></div>
+      <div><div class="frame-img r-1x1" style="background:var(--grey-1)"><img src="img/popo_img02.png" alt="Fig.02 diff灰度体积参考" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.02 diff灰度参考（中间50%，亮部30-50%，暗部60-70%）</span></div>
       <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
         <div class="card-fill"><div class="t-cat">如何制作遮罩图</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">在 Photoshop 或 SP 中创建纯色图层，用不同颜色填充不同区域。每个颜色对应一个染色分区。</p></div>
         <div class="card-fill"><div class="t-cat">注意事项</div>
@@ -499,7 +500,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S06 颜色控制 3 种模式 -->
 <section class="slide" id="slide-6" data-animate="grid-reveal">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 03 · 颜色控制</div><div class="r">06 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 03 · 颜色控制</div><div class="r">06 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
     <div><div class="t-cat">DYE COLOR MODES · 3 种染色状态</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">分区颜色 <span style="font-weight:300;font-style:italic">3 种模式</span></h2><p class="t-body" style="margin-top:clamp(8px,1.6vh,16px);opacity:.78">通过参数控制：<code style="font-family:var(--mono);font-weight:500">0</code> 单色 · <code style="font-family:var(--mono);font-weight:500">1</code> 双色渐变 · <code style="font-family:var(--mono);font-weight:500">2</code> 多彩渐变</p></div>
     <div class="mode-cards">
@@ -515,7 +516,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S07 模式对比 -->
 <section class="slide grey" id="slide-7" data-animate="duo-mirror">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">模式对比 · MODE COMPARISON</div><div class="r">07 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">模式对比 · MODE COMPARISON</div><div class="r">07 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
     <div><div class="t-cat">VISUAL COMPARISON</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.5rem,4.6vw,4.6rem);line-height:1.05;letter-spacing:-.025em">三种模式<span style="font-weight:300;font-style:italic">效果对比</span></h2></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center;flex:1">
@@ -540,14 +541,14 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S08 渐变方式 -->
 <section class="slide" id="slide-8" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 04 · 渐变方式</div><div class="r">08 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 04 · 渐变方式</div><div class="r">08 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
     <div><div class="t-cat">GRADIENT METHODS · 两种渐变</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">渐变<span style="font-weight:300;font-style:italic">方式</span></h2><p class="t-body" style="margin-top:clamp(8px,1.6vh,16px);opacity:.78">通过参数 <code style="font-family:var(--mono);font-weight:500">u_a_use_gradient_tex</code> 控制：<code style="font-family:var(--mono);font-weight:500">0</code> 方向渐变 · <code style="font-family:var(--mono);font-weight:500">1</code> 贴图渐变</p></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:start">
       <div class="card-fill">
         <div style="display:flex;align-items:center;gap:clamp(4px,1vw,10px);margin-bottom:clamp(8px,1.6vh,16px)"><span style="font-family:var(--mono);font-size:clamp(18px,3vw,40px);font-weight:600;color:var(--accent)">0</span><h3 class="t-h-prod">方向渐变</h3></div>
         <p class="t-body-sm">根据物体<strong>自身空间位置</strong>进行渐变，可设置<strong>方向</strong>和<strong>范围</strong>。</p>
-        <div style="margin-top:clamp(8px,1.6vh,16px)"><div class="frame-img" style="background:var(--grey-1)"><img src="img/img04.png" alt="Fig.04 方向渐变 · SP灰度矫正" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.04 方向渐变 · SP灰度矫正</span></div>
+        <div style="margin-top:clamp(8px,1.6vh,16px)"><div class="frame-img" style="background:var(--grey-1)"><img src="img/popo_img03.png" alt="Fig.04 SP中diff制作" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.04 SP中diff制作（染色区域灰度图）</span></div>
         <div style="margin-top:clamp(6px,1.4vh,14px);display:flex;flex-direction:column;gap:clamp(4px,.6vh,6px)">
           <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_shift_direction</code> — 渐变方向</div>
           <div class="t-body-sm"><code style="font-family:var(--mono);font-size:.88em;background:var(--grey-1);padding:.1em .4em;border-radius:2px">u_shift_range</code> — 渐变宽度</div>
@@ -556,7 +557,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
       <div class="card-fill">
         <div style="display:flex;align-items:center;gap:clamp(4px,1vw,10px);margin-bottom:clamp(8px,1.6vh,16px)"><span style="font-family:var(--mono);font-size:clamp(18px,3vw,40px);font-weight:600;color:var(--accent)">1</span><h3 class="t-h-prod">贴图渐变</h3></div>
         <p class="t-body-sm">根据遮罩图的 <strong>Alpha 通道</strong>值在两色间渐变。<strong>完全由美术控制</strong>。</p>
-        <div style="margin-top:clamp(8px,1.6vh,16px)"><div class="frame-img" style="background:var(--grey-1)"><img src="img/img05.png" alt="Fig.05 贴图渐变 · RGB通道mask" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.05 贴图渐变 · RGB通道mask</span></div>
+        <div style="margin-top:clamp(8px,1.6vh,16px)"><div class="frame-img" style="background:var(--grey-1)"><img src="img/popo_img05.png" alt="Fig.05 _dye贴图 · RGB通道mask" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.05 _dye贴图制作（RGB通道mask区分染色区域）</span></div>
         <div style="margin-top:clamp(6px,1.4vh,14px);padding:clamp(6px,1.2vh,12px);background:var(--paper);border-radius:2px">
           <div class="t-body-sm" style="color:var(--accent);font-weight:500">▸ Alpha 值 0 → 染色 1 颜色</div>
           <div class="t-body-sm" style="color:var(--accent);font-weight:500">▸ Alpha 值 1 → 染色 2 颜色</div>
@@ -572,7 +573,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S09 模型结构 -->
 <section class="slide" id="slide-9" data-animate="grid-reveal">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 05 · 程序参数</div><div class="r">09 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 05 · 程序参数</div><div class="r">09 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
     <div><div class="t-cat">MODEL STRUCTURE · 模型结构</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">模型 <span style="font-weight:300;font-style:italic">结构</span></h2></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center">
@@ -590,7 +591,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S10 整体参数 -->
 <section class="slide" id="slide-10" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">整体参数 · GLOBAL PARAMETERS</div><div class="r">10 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">整体参数 · GLOBAL PARAMETERS</div><div class="r">10 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
     <div><div class="t-cat">PROGRAM PARAMETERS</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.5rem,4.6vw,4.6rem);line-height:1.05;letter-spacing:-.025em">整体<span style="font-weight:300;font-style:italic">参数</span></h2></div>
     <table class="param-table">
@@ -611,7 +612,7 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 <!-- S11 区域参数 -->
 <section class="slide" id="slide-11" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">区域参数 · ZONE PARAMETERS</div><div class="r">11 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">区域参数 · ZONE PARAMETERS</div><div class="r">11 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
     <div><div class="t-cat">PER-ZONE PARAMETERS</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.5rem,4.6vw,4.6rem);line-height:1.05;letter-spacing:-.025em">每个染色区域的 <span style="font-weight:300;font-style:italic">参数</span></h2><p class="t-body" style="margin-top:clamp(6px,1.2vh,12px);opacity:.78">后缀 <code style="font-family:var(--mono);font-weight:500">_0</code> <code style="font-family:var(--mono);font-weight:500">_1</code> <code style="font-family:var(--mono);font-weight:500">_2</code> <code style="font-family:var(--mono);font-weight:500">_3</code> 区分不同区域</p></div>
     <table class="param-table">
@@ -633,14 +634,60 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 </section>
 <div data-notes><strong>区域参数</strong>每个染色区域独立控制。重点：<br/>• u_a_shift_mode：3 种染色模式<br/>• u_a_use_gradient_tex：2 种渐变方式<br/>• u_dye_color_major/minor：主/次染色颜色<br/>• HSL + 粗糙度 + 金属度</div>
 
-<!-- S12 贴花制作 -->
-<section class="slide" id="slide-12" data-animate="statement">
+<!-- S12 引擎材质设置 -->
+<section class="slide" id="slide-12" data-animate="grid-reveal">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 06 · 贴花制作</div><div class="r">12 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 06 · 引擎材质</div><div class="r">12 / 16</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
+    <div><div class="t-cat">ENGINE MATERIAL SETUP</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">pbr_dye <span style="font-weight:300;font-style:italic">材质设置</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:start">
+      <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
+        <div class="card-fill"><div class="t-cat">Shader 文件路径</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">参考路径：</p><p class="t-body-sm" style="font-family:var(--mono);font-size:.82em;color:var(--accent);margin-top:clamp(4px,.6vh,6px)">res/chr/boss/billy/separate_dir/billy_d_yundon/billy_d_yundon.gim</p></div>
+        <div class="card-fill"><div class="t-cat">资源上传注意</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:clamp(4px,.8vh,8px);margin-top:clamp(6px,1vh,10px)">
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> <strong>只需上传本体所需资源</strong>，晕染款材质保留本地供策划配置</li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> gim 文件：本体和晕染款共用一套（只输出上传基础款gim）</li>
+            <li class="t-body-sm" style="padding-left:1.2em;position:relative"><span style="position:absolute;left:0;color:var(--accent)">●</span> 染色 mask 贴图命名：后缀固定为 <code style="font-family:var(--mono);font-weight:500;background:var(--grey-1);padding:.15em .5em;border-radius:2px">_dye</code></li>
+          </ul>
+        </div>
+      </div>
+      <div><div class="frame-img r-4x3" style="background:var(--grey-1)"><img src="img/popo_img06.png" alt="Fig.06 pbr_dye 材质参数设置" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.06 pbr_dye shader 参数设置</span></div>
+    </div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>引擎材质设置</strong>：<br/><br/>• gim 文件：本体和晕染款共用一套，只上传基础款<br/>• 染色 mask 贴图命名后缀固定为 _dye<br/>• 只需上传本体所需资源，晕染款材质保留本地<br/>• 参考路径：res/chr/boss/billy/separate_dir/billy_d_yundon/</div>
+
+<!-- S13 染色分区示例 -->
+<section class="slide grey" id="slide-13" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">染色分区 · DYE PARTITIONING</div><div class="r">13 / 16</div></header>
+  <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
+    <div><div class="t-cat">DYE PARTITIONING EXAMPLE</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">染色<span style="font-weight:300;font-style:italic">分区示例</span></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center;flex:1">
+      <div style="display:flex;flex-direction:column;gap:clamp(8px,1.6vh,16px)">
+        <div><div class="frame-img" style="background:var(--grey-1)"><img src="img/popo_img04.png" alt="Fig.08 SP中diff灰度矫正" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.08 SP中diff灰度矫正</span></div>
+        <div><div class="frame-img" style="background:var(--grey-1)"><img src="img/popo_img07.png" alt="Fig.09 染色分区效果" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.09 染色分区效果示例</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
+        <div class="card-fill"><div class="t-cat">SP 染色测试</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">在 SP 中进行染色叠色测试，上层以正片叠底叠加颜色。最终输出需关掉眼睛输出灰度图 diff。</p></div>
+        <div class="card-fill"><div class="t-cat">diff 灰度矫正</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">可以单独对染色区域进行灰度矫正。染色区域 diff 的贴图要做成灰度图（引擎材质上以正片叠底方式叠加），非染色区域正常制作。</p></div>
+      </div>
+    </div>
+    <div class="t-meta" style="color:var(--text-helper)">参考 POPO 文档 · 3D角色运动套装染色操作步骤</div>
+  </div>
+</div>
+</section>
+<div data-notes><strong>染色分区示例</strong>：<br/><br/>• SP 中进行染色叠色测试（正片叠底叠加）<br/>• 最终输出需关掉叠色眼睛，输出灰度图 diff<br/>• diff 可以单独对染色区域进行灰度矫正</div>
+
+<!-- S14 贴花制作 -->
+<section class="slide" id="slide-14" data-animate="statement">
+<div class="canvas-card">
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">CHAPTER 07 · 贴花制作</div><div class="r">14 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(20px,5vh,48px)">
     <div><div class="t-cat">DECAL PRODUCTION</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">贴花 <span style="font-weight:300;font-style:italic">制作方法</span></h2></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,3vw,30px);align-items:center">
-      <div><div class="frame-img r-1x1" style="background:var(--grey-1)"><img src="img/img09.png" alt="Fig.07 贴花 · 4通道染色参数" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.07 贴花 · 4通道染色参数</span></div>
+      <div><div class="frame-img r-1x1" style="background:var(--grey-1)"><img src="img/popo_img08.png" alt="Fig.07 资源制作注意事项" style="width:100%;height:100%;object-fit:contain;display:block"></div><span class="img-cap">Fig.07 资源制作注意事项</span></div>
       <div style="display:flex;flex-direction:column;gap:clamp(12px,2.4vh,24px)">
         <div class="card-fill"><div class="t-cat">原理</div><p class="t-body-sm" style="margin-top:clamp(6px,1vh,10px)">染色带<strong>自定义图案</strong>，贴图有 <strong>Alpha 通道</strong>，叠加到原本的贴图上。</p></div>
         <div class="card-fill"><div class="t-cat">制作要点</div>
@@ -658,10 +705,10 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 </section>
 <div data-notes><strong>贴花</strong>是在染色基础上叠加自定义图案的方法。<br/><br/>原理：制作 Alpha 通道贴图，图案部分有颜色和非零 Alpha，非图案区域 Alpha=0，叠加到染色结果上。<br/><br/>常见应用：装饰条纹、logo、纹理细节。</div>
 
-<!-- S13 完整流程图 -->
-<section class="slide grey" id="slide-13" data-animate="statement">
+<!-- S15 完整流程图 -->
+<section class="slide grey" id="slide-15" data-animate="statement">
 <div class="canvas-card">
-  <header class="chrome-min" data-deck-chrome="1"><div class="l">PIPELINE OVERVIEW · 完整流程</div><div class="r">13 / 14</div></header>
+  <header class="chrome-min" data-deck-chrome="1"><div class="l">PIPELINE OVERVIEW · 完整流程</div><div class="r">15 / 16</div></header>
   <div style="flex:1;display:flex;flex-direction:column;gap:clamp(16px,4vh,40px)">
     <div><div class="t-cat">END-TO-END WORKFLOW</div><h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:clamp(1.6rem,4.8vw,4.8rem);line-height:1.05;letter-spacing:-.025em">从美术到引擎 <span style="font-weight:300;font-style:italic">完整管线</span></h2></div>
     <div style="display:flex;flex-direction:column;gap:clamp(12px,3vh,30px);flex:1;justify-content:center">
@@ -692,13 +739,13 @@ body.deck-edit-mode .cursor-pos-badge{display:block}
 </section>
 <div data-notes><strong>完整管线</strong>共 9 步：<br/><br/>美术阶段：1.模型拆分 2.遮罩图 3.颜色设置 4.渐变配置 5.HSL微调<br/>程序阶段：6.开启宏 7.配置参数 8.预览验证 9.完成</div>
 
-<!-- S14 总结 -->
-<section class="slide accent" id="slide-14" data-animate="split-statement">
+<!-- S16 总结 -->
+<section class="slide accent" id="slide-16" data-animate="split-statement">
 <div class="canvas-card" style="padding:0">
   <div class="split-half">
     <div class="half b-accent" style="justify-content:space-between;position:relative;overflow:hidden">
       <canvas class="ascii-bg" aria-hidden="true"></canvas>
-      <div class="chrome-min" style="margin-bottom:0;position:relative;z-index:1"><div class="l">14 / 14</div><div class="r">SUMMARY</div></div>
+      <div class="chrome-min" style="margin-bottom:0;position:relative;z-index:1"><div class="l">16 / 16</div><div class="r">SUMMARY</div></div>
       <div style="display:flex;flex-direction:column;gap:clamp(8px,2vh,20px);position:relative;z-index:1">
         <div class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em">DYE PIPELINE · KEY POINTS</div>
         <h2 style="font-family:var(--sans),var(--sans-zh);font-size:clamp(2rem,7vw,7rem);line-height:.94;letter-spacing:-.025em;font-weight:200;color:#fff">pbr_dye<br/><span style="font-style:italic;font-weight:300">染色系统</span></h2>
