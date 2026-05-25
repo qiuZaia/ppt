@@ -2763,13 +2763,12 @@
 
   document.addEventListener('paste', (e) => {
     if (!document.body.classList.contains('deck-edit-mode')) return;
-    if (pasteHandlerBlocksSlideImagePaste(e.target)) return;
-    e.preventDefault();
-    e.stopPropagation();
 
-    // Try image first, then video
+    /* Always intercept image/video pastes — create free slide objects, never trap inside text boxes */
     const imageFile = firstImageFileFromClipboard(e);
     if (imageFile) {
+      e.preventDefault();
+      e.stopPropagation();
       if (editor.selected.size === 1) {
         const w = editor.selected.values().next().value;
         if (w && w.getAttribute('data-object-type') === 'image') {
@@ -2788,6 +2787,8 @@
 
     const videoFile = firstVideoFileFromClipboard(e);
     if (videoFile) {
+      e.preventDefault();
+      e.stopPropagation();
       if (editor.selected.size === 1) {
         const w = editor.selected.values().next().value;
         if (w && w.getAttribute('data-object-type') === 'video') {
@@ -2803,6 +2804,9 @@
       }
       return;
     }
+
+    /* No media in clipboard — let text paste work normally in contenteditable */
+    if (pasteHandlerBlocksSlideImagePaste(e.target)) return;
   }, true);
 
   function addSlideObjectToCurrentSlide(kind, opts) {
